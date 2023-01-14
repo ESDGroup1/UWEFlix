@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <title>{% block title %}{% endblock %}</title>
+    {% load static %}
+    <link rel="stylesheet" type="text/css" href="{% static 'UWEFlix/site.css' %}" />
+    <!-- Add a link to a Bootstrap CSS file -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+        integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous" />
+</head>
+
+<body>
+
+
+<!-- Use Bootstrap's navbar component -->
+<!-- Use Bootstrap's navbar component -->
+<nav class="navbar navbar-expand-lg navbar-light" style="background-color: #c0fcfc88">
+    <!-- Add a button to toggle the navbar on small screens -->
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+        aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <!-- Add a container to wrap the navbar content and center it on medium-sized screens -->
+    <div class="container d-flex justify-content-between">
+        <!-- Add a logo to the navbar -->
+        <a class="navbar-brand" href="#">UWEFlix</a>
+        <!-- Add the navbar content -->
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'home' %}">Home |</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'allclubs' %}">View Clubs</a>
+                </li>
+
+                {% if iscinmanager %}
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'addfilm' %}">Add Film</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'addcinman' %}">Add Cinema Manager</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'createclub' %}">Create Club</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'createscreen' %}">Create Screen</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'createshowing' %}">Create Showing</a>
+                </li>
+                {% endif %}
+            </ul>
+
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item">
+                    <a class="btn btn-secondary" href="{% url 'logout' %}">Log Out</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+
+    <!-- Use a Bootstrap container to wrap the body content -->
+    <div class="container mt-4">
+        {% block content %} {% endblock %}
+        <hr />
+        <footer>
+            <p>|2022 - Samuel Parchao - ESD|</p>
+        </footer>
+    </div>
+
+    <!-- Add a link to a Bootstrap JavaScript file -->
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"
+        integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6"
+        crossorigin="anonymous"></script>
+</body>
+
+</html>

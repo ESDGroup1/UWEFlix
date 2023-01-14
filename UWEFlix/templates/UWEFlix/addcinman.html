@@ -1,0 +1,40 @@
+{% extends "UWEFlix/Layout.html" %}
+{% load static %}
+
+{% block content %}
+
+<div class="container mt-5">
+    {% if messages %}
+    <ul class="messages">
+        {% for message in messages %}
+            <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+        {% endfor %}
+    </ul>
+{% endif %}
+
+<div class="card mt-5">
+    <div class="card-header">
+        <h5>Add User to Cinema Manager Role</h5>
+    </div>
+    <div class="card-body">
+        <form method="post" action="{% url 'addcinman' %}">
+            {% csrf_token %}
+            <div>
+                <label for="id_user">Select User:</label>
+                <select name="user" id="id_user">
+                    {% for user in users %}
+                        <option value="{{ user.id }}">{{ user.get_full_name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary mt-2">Add User to Cinema Managers</button>
+        </form>
+    </div>
+</div>
+
+</div>
+{% endblock %}
+
+
+
+

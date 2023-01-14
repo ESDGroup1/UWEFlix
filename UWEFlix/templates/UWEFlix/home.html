@@ -1,0 +1,38 @@
+{% extends "UWEFlix/layout.html" %}
+{% load static %}
+
+{% block content %}
+{% if request.user.is_authenticated %}
+{% with user=request.user %}
+
+<div class="container mt-4">
+    <h1>Welcome {{ user.first_name }}</h1>
+    <h3>Here are the films currently on UWEFlix</h3>
+    <div class="row">
+        {% for film in films %}
+        <div class="col-6">
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">{{ film.title }}</h5>
+                    <p class="card-text">
+                        Age rating: {{ film.age_rating }}<br>
+                        Duration: {{ film.duration }} minutes<br>
+                        Description: {{ film.trailer_description }}
+                    </p>
+                    <a href="{% url 'film_detail' film_id=film.id %}" class="btn btn-primary">Learn more</a>
+                    {% if not film.has_showings and iscinmanager %}
+                    <a href="{% url 'delete_film' film_id=film.id %}" class="btn btn-danger">Delete Film</a>
+                    {% endif %}
+                    {% if iscinmanager %}
+                    <a href="{% url 'update_film' film_id=film.id %}" class="btn btn-secondary">Edit Film</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+</div>
+{% endwith %}
+{% endif %}
+{% endblock %}

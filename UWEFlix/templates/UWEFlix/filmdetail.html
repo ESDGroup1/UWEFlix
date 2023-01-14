@@ -1,0 +1,44 @@
+{% extends "UWEFlix/layout.html" %}
+{% load static %}
+
+{% block content %}
+
+<div class="container my-5">
+    <div class="row">
+        <div class="col-md-8">
+            <h1 class="mb-4">{{ film.title }}</h1>
+            <p>{{ film.trailer_description }}</p>
+        </div>
+    </div>
+    <hr>
+    <div class="row">
+        <div class="col-md-12">
+            <h4 class="mb-4">Showings</h4>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Date and Time</th>
+                        <th>Screen</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for showing in showings %}
+                    <tr>
+                        <td>{{ showing.date|date:'D d M Y H:i' }}</td>
+                        <td>Screen {{ showing.screen.number }}</td>
+                        <td>
+                            <form method="post" action="{% #}">
+                                {% csrf_token %}
+                                <button type="button" class="btn btn-primary btn-sm" onclick="alert('This function is not yet implemented.')">Book Showing</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

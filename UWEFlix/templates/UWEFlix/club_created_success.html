@@ -1,0 +1,16 @@
+{% extends "UWEFlix/layout.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1 class="text-center mb-4">Club Created Successfully</h1>
+    <div class="card text-center">
+        <div class="card-header">
+            Club Rep Credentials
+        </div>
+        <div class="card-body">
+            <h5 class="card-title">Username: {{ username }}</h5>
+            <h5 class="card-text">Password: {{ password }}</h5>
+        </div>
+    </div>
+</div>
+{% endblock %}
