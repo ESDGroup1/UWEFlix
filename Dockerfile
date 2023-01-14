@@ -1,6 +1,6 @@
 FROM python:3.10-slim-buster
 
-WORKDIR /esd-uweflix-master
+WORKDIR /esd-uweflix
 
 COPY requirements.txt requirements.txt
 
