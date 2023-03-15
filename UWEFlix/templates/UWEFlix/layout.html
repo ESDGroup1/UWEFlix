@@ -2,82 +2,67 @@
 <html>
 
 <head>
-    <meta charset="utf-8" />
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
     <title>{% block title %}{% endblock %}</title>
     {% load static %}
     <link rel="stylesheet" type="text/css" href="{% static 'UWEFlix/site.css' %}" />
-    <!-- Add a link to a Bootstrap CSS file -->
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
-        integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous" />
+    <link rel="stylesheet" href="{% static 'assets/bootstrap/css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:300,400,700&amp;display=swap">
+    <link rel="stylesheet" href="{% static 'assets/fonts/ionicons.min.css' %}">
+    <link rel="stylesheet" href="{% static 'assets/fonts/simple-line-icons.min.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pikaday/1.6.1/css/pikaday.min.css">
 </head>
 
 <body>
+    <nav class="navbar navbar-dark navbar-expand-lg bg-white portfolio-navbar gradient">
+        <div class="container"><a class="navbar-brand logo" href="#">
+            <i class="icon-screen-desktop"> </i> <strong>&nbsp;UWEFlix</strong></a><button data-bs-toggle="collapse"
+                class="navbar-toggler" data-bs-target="#navbarNav"><span class="visually-hidden">Toggle navigation</span><span class="navbar-toggler-icon"></span></button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav metus"></ul>
+                <ul class="navbar-nav">
+                    <li class="nav-item"><a class="nav-link active" href="{% url 'home' %}">Home</a></li>
+                    <li class="nav-item"><a class="nav-link active" href="{% url 'allclubs' %}">View Clubs</a></li>
 
-
-<!-- Use Bootstrap's navbar component -->
-<!-- Use Bootstrap's navbar component -->
-<nav class="navbar navbar-expand-lg navbar-light" style="background-color: #c0fcfc88">
-    <!-- Add a button to toggle the navbar on small screens -->
-    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
-        aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-    </button>
-    <!-- Add a container to wrap the navbar content and center it on medium-sized screens -->
-    <div class="container d-flex justify-content-between">
-        <!-- Add a logo to the navbar -->
-        <a class="navbar-brand" href="#">UWEFlix</a>
-        <!-- Add the navbar content -->
-        <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav">
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'home' %}">Home |</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'allclubs' %}">View Clubs</a>
-                </li>
-
-                {% if iscinmanager %}
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'addfilm' %}">Add Film</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'addcinman' %}">Add Cinema Manager</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'createclub' %}">Create Club</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'createscreen' %}">Create Screen</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'createshowing' %}">Create Showing</a>
-                </li>
-                {% endif %}
-            </ul>
-
-            <ul class="navbar-nav ml-auto">
-                <li class="nav-item">
-                    <a class="btn btn-secondary" href="{% url 'logout' %}">Log Out</a>
-                </li>
-            </ul>
+                    {% if iscinmanager %}
+                    <li class="nav-item dropdown show">
+                        <a class="dropdown-toggle nav-link" aria-expanded="true" data-bs-toggle="dropdown"
+                            href="#">Cinema Manager Options</a>
+                        <div class="dropdown-menu" data-bs-popper="none">
+                            <a class="dropdown-item" href="{% url 'addfilm' %}">Add Film</a>
+                            <a class="dropdown-item" href="{% url 'addcinman' %}">Add Cinema Manager</a>
+                            <a class="dropdown-item" href="{% url 'createclub' %}">Create Club</a>
+                            <a class="dropdown-item" href="{% url 'createscreen' %}">Create Screen</a>
+                            <a class="dropdown-item" href="{% url 'createshowing' %}">Create Showing</a>
+                        </div>
+                    </li>
+                    {% endif %}
+                </ul>
+            </div><button class="btn btn-primary" type="button" href="{% url 'logout' %}"
+                style="background: rgba(120,14,255,0.36);">Log Out</button>
         </div>
-    </div>
-</nav>
+    </nav>
+
+    {% block content %}{% endblock %}
 
 
-    <!-- Use a Bootstrap container to wrap the body content -->
-    <div class="container mt-4">
-        {% block content %} {% endblock %}
-        <hr />
-        <footer>
-            <p>|2022 - Samuel Parchao - ESD|</p>
-        </footer>
-    </div>
-
-    <!-- Add a link to a Bootstrap JavaScript file -->
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"
-        integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6"
-        crossorigin="anonymous"></script>
+    <footer class="page-footer">
+        <div class="container">
+            <div class="links"><a href="https://www.uwe.ac.uk/about">About UWE</a><a
+                    href="https://www.uwe.ac.uk/life/campus-and-facilities/information-points#:~:text=Email%20infopoint%40uwe.ac.,Ask%20a%20question%20through%20infohub.">Contact
+                    Us</a></div>
+            <div class="social-icons"><a href="https://www.facebook.com/uwebristol/"><i
+                        class="icon ion-social-facebook"></i></a><a
+                    href="https://www.instagram.com/uwebristol/?hl=en"><i
+                        class="icon ion-social-instagram-outline"></i></a><a
+                    href="https://twitter.com/UWEBristol?ref_src=twsrc%5Egoogle%7Ctwcamp%5Eserp%7Ctwgr%5Eauthor"><i
+                        class="icon ion-social-twitter"></i></a></div>
+        </div>
+    </footer>
+    <script src="{% static 'assets/bootstrap/js/bootstrap.min.js' %}"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pikaday/1.6.1/pikaday.min.js"></script>
+    <script src="{% static 'assets/js/script.min.js' %}"></script>
 </body>
 
 </html>
