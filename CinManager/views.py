@@ -5,6 +5,7 @@ from CinManager.models import Film, Screen, Showing, Club, ClubRep
 from django.contrib.auth.models import User, Group
 from django.shortcuts import  render, redirect
 from django.contrib import messages
+import uuid
 
 # Create your views here.
 #Add film function
@@ -77,9 +78,7 @@ def create_club_view(request):
         password = User.objects.make_random_password()
 
         dateofbirth = request.POST['dateofbirth']
-        
-        rawname = last_name + name
-        username = rawname.replace(" ", "")
+        username = str(uuid.uuid4())[:8]
 
         user = User.objects.create_user(username=username, password=password, first_name=first_name, last_name=last_name, email=email) #create new user instance with gathered and generated info
         user.save()
