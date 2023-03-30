@@ -8,6 +8,21 @@
 <div class="container mt-4">
     <h1>Welcome {{ user.first_name }}</h1>
     <h3>Here are the films currently on UWEFlix</h3>
+    &nbsp;
+    <form method="get">
+        <label for="date">Filter by date:</label>
+        <input type="date" id="date" name="date">
+        <button type="submit">Add Filter</button>
+        <a href="{% url 'home' %}">Reset</a>
+    </form>
+    &nbsp;
+    {% if messages %}
+    <ul class="messages">
+        {% for message in messages %}
+            <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+        {% endfor %}
+    </ul>
+    {% endif %}
     <div class="row">
         {% for film in films %}
         <div class="col-6">
