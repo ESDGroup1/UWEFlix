@@ -13,18 +13,16 @@ def is_member_CinemaManager(request):
         isCinManager = 0
     return isCinManager #returns value to orignal function
 
-from datetime import datetime
-
 def home(request):
     isCinManager = is_member_CinemaManager(request)
     
-    # check if a date has been submitted in the form
-    date = request.GET.get('date')
-    if date:
+    # get the selected date from the form if it exists
+    selected_date = request.GET.get('date')
+    if selected_date:
         try:
-            date = datetime.strptime(date, '%Y-%m-%d').date()
+            selected_date = datetime.strptime(selected_date, '%Y-%m-%d').date()
             # get all showings for the selected date
-            showings = Showing.objects.filter(date=date)
+            showings = Showing.objects.filter(date__date=selected_date)
             if not showings:
                 # show message if there are no showings on the selected date
                 messages.warning(request, "Sorry, there are no showings on this date.")
@@ -48,17 +46,40 @@ def home(request):
         else:
             film.has_showings = True
             
-    return render(request, 'UWEFlix/home.html', {'films': films, 'iscinmanager': isCinManager})
+    # pass the selected date as a context variable
+    print("OG DATE:" , selected_date)
+    context = {
+        'films': films,
+        'iscinmanager': isCinManager,
+        'selected_date': selected_date.strftime('%Y-%m-%d') if selected_date else None,
+    }
+    return render(request, 'UWEFlix/home.html', context)
 
 
 def film_detail_view(request, film_id):
     isCinManager = is_member_CinemaManager(request)
-
+    
     film = get_object_or_404(Film, id=film_id)
-    showings = Showing.objects.filter(film=film)
-    if not showings:
-        messages.error(request, "This film has no showings.")
-    return render(request, 'UWEFlix/filmdetail.html', {'film': film, 'showings': showings, 'iscinmanager': isCinManager})
+    
+    selected_date = request.GET.get('date')
+    print("SELECTED DATE:" , selected_date)
+    if selected_date:
+        try:
+            selected_date = datetime.strptime(selected_date, '%Y-%m-%d').date()
+            # get all showings for the selected date and the selected film
+            showings = Showing.objects.filter(film=film, date__date=selected_date)
+            if not showings:
+                # show message if there are no showings for the selected film on the selected date
+                messages.warning(request, "Sorry, there are no showings for this film on the selected date.")
+        except ValueError:
+            messages.error(request, "Invalid date format.")
+            showings = Showing.objects.filter(film=film)
+    else:
+        showings = Showing.objects.filter(film=film)
+    
+    return render(request, 'UWEFlix/filmdetail.html', {'film': film, 'showings': showings, 'iscinmanager': isCinManager, 'selected_date': selected_date})
+
+
 
 def view_all_clubs(request):
     isCinManager = is_member_CinemaManager(request)
@@ -72,3 +93,6 @@ def view_all_clubs(request):
 def logout_view(request):
     logout(request)
     return redirect("Login")
+
+def error_404(request, exception):
+    return render(request, 'UWEFlix/error_404.html', {}, status=404)

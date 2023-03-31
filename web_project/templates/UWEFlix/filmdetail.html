@@ -13,7 +13,15 @@
     <hr>
     <div class="row">
         <div class="col-md-12">
-            <h4 class="mb-4">Showings</h4>
+            <h4 class="mb-4">Showings{% if selected_date %} on {{ selected_date }}{% endif %}</h4>
+            {% if selected_date %}
+            {% if showings %}
+            <p>Showing on the selected date:</p>
+            {% else %}
+            <p>Sorry, there are no showings on the selected date.</p>
+            {% endif %}
+            {% endif %}
+            {% if showings %}
             <table class="table">
                 <thead>
                     <tr>
@@ -37,6 +45,7 @@
                     {% endfor %}
                 </tbody>
             </table>
+            {% endif %}
         </div>
     </div>
 </div>

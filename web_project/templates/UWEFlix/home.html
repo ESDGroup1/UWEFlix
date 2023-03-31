@@ -11,10 +11,10 @@
     &nbsp;
     <form method="get">
         <label for="date">Filter by date:</label>
-        <input type="date" id="date" name="date">
-        <button type="submit">Add Filter</button>
+        <input type="date" id="date" name="date" value="{{ selected_date }}">
+        <button type="submit">Apply Filter</button>
         <a href="{% url 'home' %}">Reset</a>
-    </form>
+    </form>    
     &nbsp;
     {% if messages %}
     <ul class="messages">
@@ -34,7 +34,7 @@
                         Duration: {{ film.duration }} minutes<br>
                         Description: {{ film.trailer_description }}
                     </p>
-                    <a href="{% url 'film_detail' film_id=film.id %}" class="btn btn-primary">Learn more</a>
+                    <a href="{% url 'film_detail' film.id %}?date={{ selected_date }}" class="btn btn-primary">Learn more</a>
                     {% if not film.has_showings and iscinmanager %}
                     <a href="{% url 'delete_film' film_id=film.id %}" class="btn btn-danger">Delete Film</a>
                     {% endif %}
