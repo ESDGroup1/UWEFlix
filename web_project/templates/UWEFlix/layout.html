@@ -39,9 +39,10 @@
                     </li>
                     {% endif %}
                 </ul>
-            </div><button class="btn btn-primary" type="button" href="{% url 'logout' %}"
-                style="background: rgba(120,14,255,0.36);">Log Out</button>
-        </div>
+            </div>
+            <a class="btn btn-primary" href="{% url 'logout' %}" style="background: rgba(120,14,255,0.36);">Log Out</a>
+            </div>
+            
     </nav>
 
     {% block content %}{% endblock %}

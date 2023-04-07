@@ -1,0 +1,63 @@
+{% extends 'UWEFlix/layout.html' %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-6">
+            <h1>{{ showing.film.title }}</h1>
+            <p>{{ showing.film.trailer_description }}</p>
+        </div>
+        <div class="col-md-6">
+            <form method="post">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="adult_tickets">Adult tickets:</label>
+                    <input type="number" class="form-control" name="adult_tickets" value="0" min="0">
+                </div>
+                <div class="form-group">
+                    <label for="student_tickets">Student tickets:</label>
+                    <input type="number" class="form-control" name="student_tickets" value="0" min="0">
+                </div>
+                <div class="form-group">
+                    <label for="child_tickets">Child tickets:</label>
+                    <input type="number" class="form-control" name="child_tickets" value="0" min="0">
+                </div>
+                <button type="submit" class="btn btn-primary mt-3">Add to Cart</button>
+            </form>
+        </div>
+    </div>
+
+    {% if latest_booking %}
+    <hr>
+    <h2>Your Cart</h2>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Ticket Type</th>
+                <th>Quantity</th>
+                <th>Price per Ticket</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Adult</td>
+                <td>{{ latest_booking.adult_tickets }}</td>
+                <td>£10</td>
+            </tr>
+            <tr>
+                <td>Student</td>
+                <td>{{ latest_booking.student_tickets }}</td>
+                <td>£8</td>
+            </tr>
+            <tr>
+                <td>Child</td>
+                <td>{{ latest_booking.child_tickets }}</td>
+                <td>£6</td>
+            </tr>
+        </tbody>
+    </table>
+    <p class="lead">Total Price: £{{ latest_booking.price }}</p>
+    <a href="#" class="btn btn-primary">Proceed</a>
+    {% endif %}
+</div>
+{% endblock %}

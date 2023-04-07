@@ -41,6 +41,8 @@ INSTALLED_APPS = [
     'Authentication',
     'CinManager',
     'Index',
+    'Bookings',
+    'Bookings.templatetags',
 ]
 
 MIDDLEWARE = [

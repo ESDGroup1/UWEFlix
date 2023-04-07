@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
+
 from Authentication.forms import LoginForm, RegistrationForm
 
 # Create your views here.
@@ -25,15 +26,16 @@ def login_view(request):
     return render(request, 'UWEFlix/login.html', {'form': form})
 
 def registration_view(request):
-	if request.method == "POST":
-		form = RegistrationForm(request.POST)
-		if form.is_valid():
-			user = form.save()
-			#login(request, user)
-			return redirect("Login")
-		messages.error(request, "Unsuccessful registration. Invalid information.")
-	form = RegistrationForm()
-	return render(request, 'UWEFlix/registration.html', {'form': form})
+    if request.method == "POST":
+        form = RegistrationForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            messages.success(request, "Registration successful. Please log in.")
+            return redirect("Login")
+    else:
+        form = RegistrationForm()
+    return render(request, 'UWEFlix/registration.html', {'form': form})
+
 
 #Standard django logout
 def logout_view(request):

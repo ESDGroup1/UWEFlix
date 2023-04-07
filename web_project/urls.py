@@ -7,6 +7,7 @@ urlpatterns = [
     path("", include("Authentication.urls")),
     path("cinmanager/", include("CinManager.urls")),
     path("index/", include("Index.urls")),
+    path("bookings/", include("Bookings.urls")),
     path('admin/', admin.site.urls),
 ]
 

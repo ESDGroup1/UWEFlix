@@ -36,10 +36,10 @@
                         <td>{{ showing.date|date:'D d M Y H:i' }}</td>
                         <td>Screen {{ showing.screen.number }}</td>
                         <td>
-                            <form method="post" action="{% #}">
+                            <form method="post" action="{% url 'add_to_cart' showing_id=showing.id %}">
                                 {% csrf_token %}
-                                <button type="button" class="btn btn-primary btn-sm" onclick="alert('This function is not yet implemented.')">Book Showing</button>
-                            </form>
+                                <button type="submit" class="btn btn-primary btn-sm">Book Showing</button>
+                            </form>                            
                         </td>
                     </tr>
                     {% endfor %}

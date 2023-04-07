@@ -7,7 +7,7 @@ from django.shortcuts import  render, redirect
 from django.contrib import messages
 import uuid
 
-# Create your views here.
+#Create your views here.
 #Add film function
 
 def is_member_CinemaManager(request):
