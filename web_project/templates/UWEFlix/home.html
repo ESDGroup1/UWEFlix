@@ -35,10 +35,10 @@
                         Description: {{ film.trailer_description }}
                     </p>
                     <a href="{% url 'film_detail' film.id %}?date={{ selected_date }}" class="btn btn-primary">Learn more</a>
-                    {% if not film.has_showings and iscinmanager %}
+                    {% if not film.has_showings and userpermissions == 1 %}
                     <a href="{% url 'delete_film' film_id=film.id %}" class="btn btn-danger">Delete Film</a>
                     {% endif %}
-                    {% if iscinmanager %}
+                    {% if userpermissions == 1 %}
                     <a href="{% url 'update_film' film_id=film.id %}" class="btn btn-secondary">Edit Film</a>
                     {% endif %}
                 </div>

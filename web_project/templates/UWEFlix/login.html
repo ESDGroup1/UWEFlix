@@ -13,6 +13,10 @@
                 <button type="submit" class="btn btn-primary btn-block mt-4">Log in</button>
                 <a class="btn btn-secondary btn-block mt-2" href="{% url 'registration' %}">Create an account</a>
             </form>
+            <form method="post" action="{% url 'login_guest' %}">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-secondary btn-block mt-2" style="background-color: #2788e4;">Log in as guest</button>
+            </form>            
         </div>
     </div>
 </div>

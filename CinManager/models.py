@@ -9,6 +9,7 @@ class Film(models.Model):
     age_rating = models.PositiveSmallIntegerField()
     duration = models.PositiveIntegerField()
     trailer_description = models.TextField()
+    imageurl = models.CharField(max_length=100)
 
 class Screen(models.Model):
     id = models.AutoField(primary_key=True)
@@ -27,9 +28,6 @@ class Club(models.Model):
     address = models.CharField(max_length=100)
     contact_number = models.CharField(max_length=100)
     email = models.CharField(max_length=100)
-    account_number = models.CharField(max_length=100)
-    cvv = models.CharField(max_length=3)
-    expdate = models.DateField(default=datetime.now)
     discount_rate = models.PositiveIntegerField()
 
 class ClubRep(models.Model):

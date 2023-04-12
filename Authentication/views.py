@@ -1,7 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
-
 from Authentication.forms import LoginForm, RegistrationForm
 
 # Create your views here.
@@ -35,6 +34,20 @@ def registration_view(request):
     else:
         form = RegistrationForm()
     return render(request, 'UWEFlix/registration.html', {'form': form})
+
+def login_guest_view(request):
+    # Authenticate the guest user
+    user = authenticate(request, username='guest', password='d63ztyyyX5XptU!')
+
+    if user is not None:
+        # Login the user
+        login(request, user)
+        return redirect("home")
+    else:
+        # Authentication failed
+        messages.error(request, "Guest login failed.")
+
+    return redirect("Login")
 
 
 #Standard django logout

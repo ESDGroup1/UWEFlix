@@ -4,17 +4,23 @@ from django.shortcuts import get_object_or_404, redirect, render
 from CinManager.models import Club, ClubRep, Film, Screen, Showing
 from datetime import datetime
 
+def check_permissions(request):
+    if request.user.is_authenticated:
+        if request.user.groups.filter(name='Cinema Managers').exists():
+            userpermission = 1
+        elif request.user.groups.filter(name='Club Representatives').exists():
+            userpermission = 2
+        elif request.user.groups.filter(name='Account Managers').exists():
+            userpermission = 3
+        elif request.user.groups.filter(name='Guest').exists():
+            userpermission = 4
+        else:
+            userpermission = 0
 
-# Create your views here.
-def is_member_CinemaManager(request):
-    if request.user.groups.filter(name='Cinema Managers').exists(): #checks if user is in Cinema Managers django group
-        isCinManager = 1 # sets 1 if yes
-    else:
-        isCinManager = 0
-    return isCinManager #returns value to orignal function
+    return userpermission
 
 def home(request):
-    isCinManager = is_member_CinemaManager(request)
+    userpermissions = check_permissions(request)
     
     # get the selected date from the form if it exists
     selected_date = request.GET.get('date')
@@ -50,14 +56,14 @@ def home(request):
     print("OG DATE:" , selected_date)
     context = {
         'films': films,
-        'iscinmanager': isCinManager,
+        'userpermissions': userpermissions,
         'selected_date': selected_date.strftime('%Y-%m-%d') if selected_date else None,
     }
     return render(request, 'UWEFlix/home.html', context)
 
 
 def film_detail_view(request, film_id):
-    isCinManager = is_member_CinemaManager(request)
+    userpermissions = check_permissions(request)
     
     film = get_object_or_404(Film, id=film_id)
     
@@ -77,17 +83,17 @@ def film_detail_view(request, film_id):
     else:
         showings = Showing.objects.filter(film=film)
     
-    return render(request, 'UWEFlix/filmdetail.html', {'film': film, 'showings': showings, 'iscinmanager': isCinManager, 'selected_date': selected_date})
+    return render(request, 'UWEFlix/filmdetail.html', {'film': film, 'showings': showings, 'userpermissions': userpermissions, 'selected_date': selected_date})
 
 
 
 def view_all_clubs(request):
-    isCinManager = is_member_CinemaManager(request)
+    userpermissions = check_permissions(request)
 
     #gathers data from db
     clubs = Club.objects.all()
     club_reps = ClubRep.objects.all()
-    return render(request, 'UWEFlix/allclubs.html', {'clubs': clubs, 'club_reps': club_reps, 'iscinmanager': isCinManager})
+    return render(request, 'UWEFlix/allclubs.html', {'clubs': clubs, 'club_reps': club_reps, 'userpermissions': userpermissions})
 
 #Standard django logout
 def logout_view(request):

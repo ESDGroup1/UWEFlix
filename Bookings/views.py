@@ -1,9 +1,25 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from .models import Showing, Booking
 
+def check_permissions(request):
+    if request.user.is_authenticated:
+        if request.user.groups.filter(name='Cinema Managers').exists():
+            userpermission = 1
+        elif request.user.groups.filter(name='Club Representatives').exists():
+            userpermission = 2
+        elif request.user.groups.filter(name='Account Managers').exists():
+            userpermission = 3
+        elif request.user.groups.filter(name='Guest').exists():
+            userpermission = 4
+        else:
+            userpermission = 0
+
+    return userpermission
+
 def add_to_cart(request, showing_id):
     # Get the showing object
     showing = get_object_or_404(Showing, id=showing_id)
+    userpermissions = check_permissions(request)
 
     if request.method == 'POST':
         # Get the ticket counts from the form data
@@ -31,6 +47,6 @@ def add_to_cart(request, showing_id):
     else:
         # Get the latest booking for the current user and showing
         latest_booking = Booking.objects.filter(showing=showing, user=request.user).latest('id')
-        context = {'showing': showing, 'latest_booking': latest_booking}
+        context = {'showing': showing, 'latest_booking': latest_booking, 'userpermissions': userpermissions}
         return render(request, 'UWEFlix/add_to_cart.html', context)
 

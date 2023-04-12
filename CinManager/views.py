@@ -10,15 +10,24 @@ import uuid
 #Create your views here.
 #Add film function
 
-def is_member_CinemaManager(request):
-    if request.user.groups.filter(name='Cinema Managers').exists(): #checks if user is in Cinema Managers django group
-        isCinManager = 1 # sets 1 if yes
-    else:
-        isCinManager = 0
-    return isCinManager #returns value to orignal function
+def check_permissions(request):
+    if request.user.is_authenticated:
+        if request.user.groups.filter(name='Cinema Managers').exists():
+            userpermission = 1
+        elif request.user.groups.filter(name='Club Representatives').exists():
+            userpermission = 2
+        elif request.user.groups.filter(name='Account Managers').exists():
+            userpermission = 3
+        elif request.user.groups.filter(name='Guest').exists():
+            userpermission = 4
+        else:
+            userpermission = 0
+
+    return userpermission
+
 
 def add_film_view(request):
-    isCinManager = is_member_CinemaManager(request) #all functions check for cinemamagers status to set nav bar permissions
+    userpermissions = check_permissions(request) #all functions check for cinemamagers status to set nav bar permissions
 
     if request.method == 'POST':
         form = FilmForm(request.POST)
@@ -27,10 +36,10 @@ def add_film_view(request):
             return redirect('home')
     else:
         form = FilmForm()
-    return render(request, 'UWEFlix/filmadd.html', {'form': form, 'iscinmanager': isCinManager}) 
+    return render(request, 'UWEFlix/filmadd.html', {'form': form, 'userpermissions': userpermissions}) 
 
 def addCinManagers(request):
-    isCinManager = is_member_CinemaManager(request)
+    userpermissions = check_permissions(request)
 
     # Only allow users who are already in the Cinema Managers group to access this page
     if not request.user.groups.filter(name='Cinema Managers').exists():
@@ -50,11 +59,11 @@ def addCinManagers(request):
 
         return redirect('home')
 
-    return render(request, 'UWEFlix/addcinman.html', {'users': users , 'iscinmanager': isCinManager})
+    return render(request, 'UWEFlix/addcinman.html', {'users': users , 'userpermissions': userpermissions})
 
 
 def create_club_view(request):
-    isCinManager = is_member_CinemaManager(request)
+    userpermissions = check_permissions(request)
 
     if request.method == 'POST':
 
@@ -94,20 +103,20 @@ def create_club_view(request):
         
         #send to page which will show the generated credentials to user
         return redirect('clubcreatedsucess', username=username, password=password)
-    return render(request, 'UWEFlix/createclub.html', {'iscinmanager': isCinManager})
+    return render(request, 'UWEFlix/createclub.html', {'userpermissions': userpermissions})
 
 def clubcreatedsucess(request,username,password):
-    isCinManager = is_member_CinemaManager(request)
+    userpermissions = check_permissions(request)
 
     #diagnostic print
     print("Username2: " , username)
     print("Password2: " , password)
 
-    return render(request,'UWEFlix/club_created_success.html', {'iscinmanager': isCinManager, 'username':username, 'password':password})
+    return render(request,'UWEFlix/club_created_success.html', {'userpermissions': userpermissions, 'username':username, 'password':password})
 
 #Simple form submit function
 def create_screen_view(request):
-    isCinManager = is_member_CinemaManager(request)
+    userpermissions = check_permissions(request)
 
     if request.method == 'POST':
         form = ScreenForm(request.POST)
@@ -116,11 +125,11 @@ def create_screen_view(request):
             return redirect('home')
     else:
         form = ScreenForm()
-    return render(request, 'UWEFlix/createscreen.html', {'form': form , 'iscinmanager': isCinManager})
+    return render(request, 'UWEFlix/createscreen.html', {'form': form , 'userpermissions': userpermissions})
 
 
 def create_showing_view(request):
-    isCinManager = is_member_CinemaManager(request)
+    userpermissions = check_permissions(request)
 
     films = Film.objects.all()
     screens = Screen.objects.all()
@@ -132,14 +141,14 @@ def create_showing_view(request):
             return redirect('home')
     else:
         form = ShowingForm()
-    return render(request, 'UWEFlix/createshowing.html', {'form': form, 'films': films, 'screens': screens , 'iscinmanager': isCinManager})
+    return render(request, 'UWEFlix/createshowing.html', {'form': form, 'films': films, 'screens': screens , 'userpermissions': userpermissions})
 
 #Delete film function
 def delete_film(request, film_id):
-    isCinManager = is_member_CinemaManager(request)
+    userpermissions = check_permissions(request)
 
     #checks permissions
-    if isCinManager == 1:
+    if userpermissions == 1:
         film = get_object_or_404(Film, id=film_id) #gathers selected film
         showings = Showing.objects.filter(film=film)
         if showings: #checks if films has showing, films with showings will not be deleted, this is in place as a safety measure as delete button is not visible when showings are present
@@ -153,7 +162,7 @@ def delete_film(request, film_id):
 
 
 def update_film(request, film_id):
-    isCinManager = is_member_CinemaManager(request)
+    userpermissions = check_permissions(request)
 
     #Find instance of selected film
     film = Film.objects.get(pk=film_id)
@@ -162,10 +171,10 @@ def update_film(request, film_id):
     if form.is_valid():
         form.save()
         return redirect('home')
-    return render(request, 'UWEFlix/updatefilm.html', {'film':film, 'form':form, 'iscinmanager': isCinManager})
+    return render(request, 'UWEFlix/updatefilm.html', {'film':film, 'form':form, 'userpermissions': userpermissions})
 
 def update_club(request, club_id):
-    isCinManager = is_member_CinemaManager(request)
+    userpermissions = check_permissions(request)
 
     #Find instance of selected club and connect it to club rep
     club = Club.objects.get(pk=club_id)
@@ -192,4 +201,4 @@ def update_club(request, club_id):
         club_rep.save()
 
         return redirect('home')
-    return render(request, 'UWEFlix/editclub.html', {'club': club, 'club_rep': club_rep, 'iscinmanager': isCinManager})
+    return render(request, 'UWEFlix/editclub.html', {'club': club, 'club_rep': club_rep, 'userpermissions': userpermissions})

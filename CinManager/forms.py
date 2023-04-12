@@ -11,7 +11,7 @@ class FilmForm(forms.ModelForm):
 class ClubForm(forms.ModelForm):
     class Meta:
         model = Club
-        fields = ['name', 'address', 'contact_number', 'email', 'account_number', 'discount_rate']
+        fields = ['name', 'address', 'contact_number', 'email', 'discount_rate']
 
 class ScreenForm(forms.ModelForm):
     class Meta:

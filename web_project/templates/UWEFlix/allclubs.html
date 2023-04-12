@@ -22,7 +22,7 @@
                 {% endfor %}
             </td>
             <td>
-                {% if iscinmanager %}
+                {% if userpermissions == 1 %}
                     <a href="{% url 'update_club' club_id=club.id %}" class="btn btn-primary btn-sm">Edit Details</a>
                 {% endif %}
                 <button type="button" class="btn btn-primary btn-sm" onclick="alert('This function is not yet implemented.')">Contact Rep</button>
