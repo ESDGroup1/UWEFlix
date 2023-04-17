@@ -13,7 +13,8 @@ def check_permissions(request):
             userpermission = 4
         else:
             userpermission = 0
-
+    else:
+        return redirect('Login')
     return userpermission
 
 def add_to_cart(request, showing_id):
@@ -49,4 +50,6 @@ def add_to_cart(request, showing_id):
         latest_booking = Booking.objects.filter(showing=showing, user=request.user).latest('id')
         context = {'showing': showing, 'latest_booking': latest_booking, 'userpermissions': userpermissions}
         return render(request, 'UWEFlix/add_to_cart.html', context)
+    
+
 

@@ -34,6 +34,7 @@ class PersonalReceipt(models.Model):
 class PaymentDetails(models.Model):
     id = models.AutoField(primary_key=True, unique=True)
     user = models.ForeignKey(User, on_delete=models.DO_NOTHING)
-    account_number = models.CharField(max_length=100)
+    account_number = models.CharField(max_length=16)
     cvv = models.CharField(max_length=3)
     expdate = models.DateField(default=datetime.now)
+

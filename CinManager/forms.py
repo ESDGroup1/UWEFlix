@@ -6,7 +6,7 @@ from CinManager.models import Film, Club, Screen, Showing
 class FilmForm(forms.ModelForm):
     class Meta:
         model = Film
-        fields = ['title', 'age_rating', 'duration', 'trailer_description']
+        fields = ['title', 'age_rating', 'duration', 'trailer_description', 'imageurl']
 
 class ClubForm(forms.ModelForm):
     class Meta:

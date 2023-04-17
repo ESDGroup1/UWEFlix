@@ -29,6 +29,7 @@
             <div class="card mb-4">
                 <div class="card-body">
                     <h5 class="card-title">{{ film.title }}</h5>
+                    <img src="{{ film.imageurl }}" alt="{{ film.title }}" class="img-fluid" style="max-height: 200px">
                     <p class="card-text">
                         Age rating: {{ film.age_rating }}<br>
                         Duration: {{ film.duration }} minutes<br>

@@ -9,6 +9,7 @@ urlpatterns = [
     path("index/", include("Index.urls")),
     path("bookings/", include("Bookings.urls")),
     path('admin/', admin.site.urls),
+    path('accounts/', include('Accounts.urls')),
 ]
 
 handler404 = 'Index.views.error_404'

@@ -16,7 +16,8 @@ def check_permissions(request):
             userpermission = 4
         else:
             userpermission = 0
-
+    else:
+        return redirect('Login')
     return userpermission
 
 def home(request):

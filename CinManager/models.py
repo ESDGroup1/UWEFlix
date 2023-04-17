@@ -9,7 +9,7 @@ class Film(models.Model):
     age_rating = models.PositiveSmallIntegerField()
     duration = models.PositiveIntegerField()
     trailer_description = models.TextField()
-    imageurl = models.CharField(max_length=100)
+    imageurl = models.CharField(max_length=1000)
 
 class Screen(models.Model):
     id = models.AutoField(primary_key=True)

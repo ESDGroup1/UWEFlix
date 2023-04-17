@@ -43,6 +43,8 @@ INSTALLED_APPS = [
     'Index',
     'Bookings',
     'Bookings.templatetags',
+    'Accounts',
+    'partial_date',
 ]
 
 MIDDLEWARE = [
@@ -118,6 +120,8 @@ TIME_ZONE = 'UTC'
 USE_I18N = True
 
 USE_TZ = True
+
+SESSION_COOKIE_AGE = 1200
 
 
 # Static files (CSS, JavaScript, Images)

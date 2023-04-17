@@ -7,9 +7,6 @@ from django.shortcuts import  render, redirect
 from django.contrib import messages
 import uuid
 
-#Create your views here.
-#Add film function
-
 def check_permissions(request):
     if request.user.is_authenticated:
         if request.user.groups.filter(name='Cinema Managers').exists():
@@ -22,7 +19,8 @@ def check_permissions(request):
             userpermission = 4
         else:
             userpermission = 0
-
+    else:
+        return redirect('Login')
     return userpermission
 
 
