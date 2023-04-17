@@ -12,17 +12,53 @@
                 {% csrf_token %}
                 <div class="form-group">
                     <label for="adult_tickets">Adult tickets:</label>
-                    <input type="number" class="form-control" name="adult_tickets" value="0" min="0">
+                    <input type="number" class="form-control" name="adult_tickets"
+                        value="{{ latest_booking.adult_tickets }}" min="0">
                 </div>
                 <div class="form-group">
                     <label for="student_tickets">Student tickets:</label>
-                    <input type="number" class="form-control" name="student_tickets" value="0" min="0">
+                    <input type="number" class="form-control" name="student_tickets"
+                        value="{{ latest_booking.student_tickets }}" min="0">
                 </div>
                 <div class="form-group">
                     <label for="child_tickets">Child tickets:</label>
-                    <input type="number" class="form-control" name="child_tickets" value="0" min="0">
+                    <input type="number" class="form-control" name="child_tickets"
+                        value="{{ latest_booking.child_tickets }}" min="0">
                 </div>
-                <button type="submit" class="btn btn-primary mt-3">Add to Cart</button>
+                <button type="submit" class="btn btn-primary mt-3">Update Cart</button>
+            </form>
+
+            <!-- Button trigger modal -->
+            <button type="button" class="btn btn-danger mt-3" data-toggle="modal" data-target="#cancelModal">Cancel Booking</button>
+            
+            <!-- Modal -->
+            <div class="modal fade" id="cancelModal" tabindex="-1" role="dialog"
+                aria-labelledby="cancelModalLabel" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="cancelModalLabel">Cancel Booking</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            Are you sure you want to cancel your unpaid booking for {{ showing.film.title }} on {{showing.date }}?
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <form method="post" action="{% url 'cancel_booking' latest_booking.id %}">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-danger">Yes, cancel my booking</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <form method="post" action="#">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-success mt-3">Book Showing</button>
             </form>
         </div>
     </div>
@@ -57,7 +93,7 @@
         </tbody>
     </table>
     <p class="lead">Total Price: £{{ latest_booking.price }}</p>
-    <a href="#" class="btn btn-primary">Proceed</a>
     {% endif %}
 </div>
 {% endblock %}
+

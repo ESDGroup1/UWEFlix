@@ -129,9 +129,12 @@ SESSION_COOKIE_AGE = 1200
 
 STATIC_URL = 'web_project/static/'
 
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
 STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'web_project/static'),
+    os.path.join(BASE_DIR, 'web_project', 'static'),
 ]
+
 
 
 # Default primary key field type

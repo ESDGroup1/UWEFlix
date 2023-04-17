@@ -31,25 +31,60 @@ def add_to_cart(request, showing_id):
         # Calculate the total price
         price = (adult_tickets * 10) + (student_tickets * 8) + (child_tickets * 6)
 
-        # Create a new Booking object with the ticket counts and price
-        booking = Booking.objects.create(
-            showing=showing,
-            user=request.user,
-            adult_tickets=adult_tickets,
-            student_tickets=student_tickets,
-            child_tickets=child_tickets,
-            price=price,
-            purchased=False
-        )
+        # Get the latest booking for the current user and showing
+        latest_booking = Booking.objects.filter(showing=showing, user=request.user).latest('id')
+
+        # Update the existing Booking object with the new ticket counts and price
+        latest_booking.adult_tickets = adult_tickets
+        latest_booking.student_tickets = student_tickets
+        latest_booking.child_tickets = child_tickets
+        latest_booking.price = price
+        latest_booking.save()
 
         # Redirect to the same page to avoid duplicate form submissions
         return redirect('add_to_cart', showing_id=showing_id)
 
     else:
-        # Get the latest booking for the current user and showing
-        latest_booking = Booking.objects.filter(showing=showing, user=request.user).latest('id')
-        context = {'showing': showing, 'latest_booking': latest_booking, 'userpermissions': userpermissions}
-        return render(request, 'UWEFlix/add_to_cart.html', context)
-    
+        # Check if the "Book Showing" button was clicked
+        book_showing = request.GET.get('book_showing')
+
+        if book_showing:
+            # Get the ticket counts from the latest booking for the current user and showing
+            latest_booking = Booking.objects.filter(showing=showing, user=request.user).latest('id')
+            adult_tickets = latest_booking.adult_tickets
+            student_tickets = latest_booking.student_tickets
+            child_tickets = latest_booking.child_tickets
+
+            # Calculate the total price
+            price = latest_booking.price
+
+            # Create a new Booking object with the ticket counts and price
+            booking = Booking.objects.create(
+                showing=showing,
+                user=request.user,
+                adult_tickets=adult_tickets,
+                student_tickets=student_tickets,
+                child_tickets=child_tickets,
+                price=price,
+                purchased=False
+            )
+
+            # Redirect to the same page to avoid duplicate form submissions
+            return redirect('add_to_cart', showing_id=showing_id)
+
+        else:
+            # Get the latest booking for the current user and showing
+            latest_booking = Booking.objects.filter(showing=showing, user=request.user).latest('id')
+            context = {'showing': showing, 'latest_booking': latest_booking, 'userpermissions': userpermissions}
+            return render(request, 'UWEFlix/add_to_cart.html', context)
+
+def cancel_booking(request, booking_id):
+    booking = get_object_or_404(Booking, id=booking_id)
+
+    if request.method == 'POST':
+        booking.delete()
+        return redirect('film_detail', film_id=booking.showing.film.id)
+
+    return redirect('home')
 
 

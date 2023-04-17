@@ -37,11 +37,30 @@
                     </p>
                     <a href="{% url 'film_detail' film.id %}?date={{ selected_date }}" class="btn btn-primary">Learn more</a>
                     {% if not film.has_showings and userpermissions == 1 %}
-                    <a href="{% url 'delete_film' film_id=film.id %}" class="btn btn-danger">Delete Film</a>
+                    <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#deleteFilmModal{{ film.id }}">Delete Film</button>
                     {% endif %}
                     {% if userpermissions == 1 %}
                     <a href="{% url 'update_film' film_id=film.id %}" class="btn btn-secondary">Edit Film</a>
                     {% endif %}
+                </div>
+            </div>
+        </div>
+        <div class="modal fade" id="deleteFilmModal{{ film.id }}" tabindex="-1" role="dialog" aria-labelledby="deleteFilmModalLabel{{ film.id }}" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="deleteFilmModalLabel{{ film.id }}">Delete Film</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        Are you sure you want to delete the film "{{ film.title }}"?
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                        <a href="{% url 'delete_film' film_id=film.id %}" class="btn btn-danger">Delete</a>
+                    </div>
                 </div>
             </div>
         </div>
