@@ -1,10 +1,17 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.models import User, Group
 from Authentication.forms import LoginForm, RegistrationForm
 
 # Create your views here.
 def login_view(request):
+    # Create user groups if they don't exist
+    Group.objects.get_or_create(name='Guest')
+    Group.objects.get_or_create(name='Cinema Managers')
+    Group.objects.get_or_create(name='Club Representatives')
+    Group.objects.get_or_create(name='Account Managers')
+
     if request.method == 'POST':
         form = LoginForm(request.POST)
         if form.is_valid():
@@ -36,12 +43,25 @@ def registration_view(request):
     return render(request, 'UWEFlix/registration.html', {'form': form})
 
 def login_guest_view(request):
+    # Check if the guest user exists
+    try:
+        guest_user = User.objects.get(username='guest')
+    except User.DoesNotExist:
+        # Create the guest user
+        guest_user = User.objects.create_user(username='guest', password='d63ztyyyX5XptU!')
+
     # Authenticate the guest user
     user = authenticate(request, username='guest', password='d63ztyyyX5XptU!')
 
     if user is not None:
         # Login the user
         login(request, user)
+
+        # Add guest user to 'Guest' group if not already a member
+        guest_group = Group.objects.get(name='Guest')
+        if not guest_group.user_set.filter(pk=user.pk).exists():
+            guest_group.user_set.add(user)
+
         return redirect("home")
     else:
         # Authentication failed

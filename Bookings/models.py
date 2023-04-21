@@ -17,7 +17,7 @@ class Booking(models.Model):
     adult_tickets = models.PositiveIntegerField(default=0)
     student_tickets = models.PositiveIntegerField(default=0)
     child_tickets = models.PositiveIntegerField(default=0)
-    price = models.DecimalField(max_digits=6, decimal_places=2)
+    price = models.DecimalField(max_digits=6, decimal_places=2, default=0)
     purchased = models.BooleanField(default=False)
 
     def __str__(self):

@@ -31,10 +31,14 @@ def add_to_cart(request, showing_id):
         # Calculate the total price
         price = (adult_tickets * 10) + (student_tickets * 8) + (child_tickets * 6)
 
-        # Get the latest booking for the current user and showing
-        latest_booking = Booking.objects.filter(showing=showing, user=request.user).latest('id')
+        # Try to get the latest booking for the current user and showing
+        try:
+            latest_booking = Booking.objects.filter(showing=showing, user=request.user).latest('id')
+        except Booking.DoesNotExist:
+            # If no booking exists, create a new one
+            latest_booking = Booking.objects.create(showing=showing, user=request.user)
 
-        # Update the existing Booking object with the new ticket counts and price
+        # Update the existing or new Booking object with the new ticket counts and price
         latest_booking.adult_tickets = adult_tickets
         latest_booking.student_tickets = student_tickets
         latest_booking.child_tickets = child_tickets
@@ -50,21 +54,29 @@ def add_to_cart(request, showing_id):
 
         if book_showing:
             # Get the ticket counts from the latest booking for the current user and showing
-            latest_booking = Booking.objects.filter(showing=showing, user=request.user).latest('id')
-            adult_tickets = latest_booking.adult_tickets
-            student_tickets = latest_booking.student_tickets
-            child_tickets = latest_booking.child_tickets
+            try:
+                latest_booking = Booking.objects.filter(showing=showing, user=request.user).latest('id')
+            except Booking.DoesNotExist:
+                # If no booking exists, create a new one with default ticket counts
+                latest_booking = Booking.objects.create(
+                    showing=showing,
+                    user=request.user,
+                    adult_tickets=0,
+                    student_tickets=0,
+                    child_tickets=0,
+                    purchased=False
+                )
 
             # Calculate the total price
-            price = latest_booking.price
+            price = latest_booking.get_price()
 
             # Create a new Booking object with the ticket counts and price
             booking = Booking.objects.create(
                 showing=showing,
                 user=request.user,
-                adult_tickets=adult_tickets,
-                student_tickets=student_tickets,
-                child_tickets=child_tickets,
+                adult_tickets=latest_booking.adult_tickets,
+                student_tickets=latest_booking.student_tickets,
+                child_tickets=latest_booking.child_tickets,
                 price=price,
                 purchased=False
             )
@@ -73,10 +85,15 @@ def add_to_cart(request, showing_id):
             return redirect('add_to_cart', showing_id=showing_id)
 
         else:
-            # Get the latest booking for the current user and showing
-            latest_booking = Booking.objects.filter(showing=showing, user=request.user).latest('id')
+            # Get the latest booking for the current user and showing, or create a new one if none exists
+            try:
+                latest_booking = Booking.objects.filter(showing=showing, user=request.user).latest('id')
+            except Booking.DoesNotExist:
+                latest_booking = Booking.objects.create(showing=showing, user=request.user)
+
             context = {'showing': showing, 'latest_booking': latest_booking, 'userpermissions': userpermissions}
             return render(request, 'UWEFlix/add_to_cart.html', context)
+
 
 def cancel_booking(request, booking_id):
     booking = get_object_or_404(Booking, id=booking_id)
