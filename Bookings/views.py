@@ -104,7 +104,9 @@ def add_to_cart(request, showing_id):
             except Booking.DoesNotExist:
                 latest_booking = Booking.objects.create(showing=showing, user=request.user)
 
-            context = {'showing': showing, 'latest_booking': latest_booking, 'userpermissions': userpermissions,'club_id': club_id}
+            
+            # Pass the payment intent ID to the template
+            context = {'showing': showing, 'latest_booking': latest_booking, 'userpermissions': userpermissions, 'club_id': club_id}
             return render(request, 'UWEFlix/add_to_cart.html', context)
 
 
@@ -131,19 +133,25 @@ def payment(request, booking_id):
         price = latest_booking.get_price()
 
         # Create a new Stripe Checkout Session
+        stripe.api_key = settings.STRIPE_SECRET_KEY
         session = stripe.checkout.Session.create(
             payment_method_types=['card'],
             line_items=[{
-                'name': 'Ticket for ' + latest_booking.showing.film.title,
-                'description': 'Showing at ' + str(latest_booking.showing.datetime),
-                'amount': price * 100,
-                'currency': 'usd',
+                'price_data': {
+                    'currency': 'gbp',
+                    'product_data': {
+                        'name': 'Ticket for ' + latest_booking.showing.film.title,
+                        'description': 'Showing at ' + str(latest_booking.showing.date),
+                    },
+                    'unit_amount': int(price) * 100,
+                },
                 'quantity': latest_booking.get_total_tickets(),
             }],
             mode='payment',
-            success_url=request.build_absolute_uri(reverse('payment_success')),
-            cancel_url=request.build_absolute_uri(reverse('payment_cancel')),
+            success_url=request.build_absolute_uri(reverse('home')),
+            cancel_url=request.build_absolute_uri(reverse('home')),
         )
+
 
         # Store the Session ID in the latest booking object
         latest_booking.stripe_session_id = session.id

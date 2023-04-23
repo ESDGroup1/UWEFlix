@@ -22,6 +22,10 @@ class Booking(models.Model):
 
     def get_price(self):
         return self.price
+    
+    def get_total_tickets(self):
+        tickets = self.adult_tickets + self.child_tickets + self.student_tickets
+        return tickets
 
     def __str__(self):
         return f"{self.adult_tickets} adult tickets, {self.student_tickets} student tickets, {self.child_tickets} child tickets for {self.user.username} ({'purchased' if self.purchased else 'not purchased'})"
