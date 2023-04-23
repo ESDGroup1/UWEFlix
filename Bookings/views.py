@@ -1,8 +1,10 @@
 from django.shortcuts import render, get_object_or_404, redirect
+from django.urls import reverse
 from CinManager.models import ClubRep
 from web_project import settings
 from .models import Showing, Booking
 import stripe
+
 
 def check_permissions(request):
     if request.user.is_authenticated:
@@ -19,6 +21,7 @@ def check_permissions(request):
     else:
         return redirect('Login')
     return userpermission
+
 
 def add_to_cart(request, showing_id):
 
@@ -100,20 +103,9 @@ def add_to_cart(request, showing_id):
                 latest_booking = Booking.objects.filter(showing=showing, user=request.user).latest('id')
             except Booking.DoesNotExist:
                 latest_booking = Booking.objects.create(showing=showing, user=request.user)
-    # Calculate the total price
-    price = latest_booking.get_price()
 
-    # Create a payment intent with Stripe
-    stripe.api_key = settings.STRIPE_SECRET_KEY
-    intent = stripe.PaymentIntent.create(
-        amount=price * 100,  # Stripe requires the amount in cents
-        currency="gbp",
-        payment_method_types=["card"]
-    )
-
-    # Pass the payment intent ID to the template
-    context = {'showing': showing, 'latest_booking': latest_booking, 'userpermissions': userpermissions, 'club_id': club_id, 'client_secret': intent.client_secret}
-    return render(request, 'UWEFlix/add_to_cart.html', context)
+            context = {'showing': showing, 'latest_booking': latest_booking, 'userpermissions': userpermissions,'club_id': club_id}
+            return render(request, 'UWEFlix/add_to_cart.html', context)
 
 
 def cancel_booking(request, booking_id):
@@ -126,24 +118,40 @@ def cancel_booking(request, booking_id):
     return redirect('home')
 
 
-def book_showing(request):
+def payment(request, booking_id):
     if request.method == 'POST':
-        # Set your secret key: remember to change this to your live secret key in production
-        # See your keys here: https://dashboard.stripe.com/apikeys
-        stripe.api_key = settings.STRIPE_SECRET_KEY
-        
-        # Get the payment token submitted by the form
-        token = request.POST.get('stripeToken')
-        
-        # Create a charge: this will charge the user's card
-        charge = stripe.Charge.create(
-            amount=1000, # amount in cents, change this to the actual amount you want to charge
-            currency='usd',
-            description='Booking a showing',
-            source=token,
+        # Get the user's cart data
+        try:
+            latest_booking = Booking.objects.filter(
+                user=request.user, purchased=False).latest('id')
+        except Booking.DoesNotExist:
+            return redirect('index')
+
+        # Calculate the total price
+        price = latest_booking.get_price()
+
+        # Create a new Stripe Checkout Session
+        session = stripe.checkout.Session.create(
+            payment_method_types=['card'],
+            line_items=[{
+                'name': 'Ticket for ' + latest_booking.showing.film.title,
+                'description': 'Showing at ' + str(latest_booking.showing.datetime),
+                'amount': price * 100,
+                'currency': 'usd',
+                'quantity': latest_booking.get_total_tickets(),
+            }],
+            mode='payment',
+            success_url=request.build_absolute_uri(reverse('payment_success')),
+            cancel_url=request.build_absolute_uri(reverse('payment_cancel')),
         )
-        
-        # Redirect to a success page
-        return redirect('home')
-    
-    return render(request, 'Bookings/book_showing.html')
+
+        # Store the Session ID in the latest booking object
+        latest_booking.stripe_session_id = session.id
+        latest_booking.save()
+
+        # Render the Stripe Checkout page
+        context = {'session_id': session.id}
+        return render(request, 'UWEFlix/payment.html', context)
+
+    else:
+        return redirect('index')
