@@ -30,10 +30,9 @@
                     <li class="nav-item"><a class="nav-link active" href="{% url 'home' %}">Home</a></li>
                     <li class="nav-item"><a class="nav-link active" href="{% url 'allclubs' %}">View Clubs</a></li>
                     
-                    {% if not userpermissions == 4 %}
+                    {% if userpermissions != 4 and userpermissions != 2 %}
                     <li class="nav-item dropdown show">
-                        <a class="dropdown-toggle nav-link" aria-expanded="true" data-bs-toggle="dropdown"
-                            href="#">My Account</a>
+                        <a class="dropdown-toggle nav-link" aria-expanded="true" data-bs-toggle="dropdown" href="#">My Account</a>
                         <div class="dropdown-menu" data-bs-popper="none">
                             <a class="dropdown-item" href="{% url 'edit_payment_details' %}">Payment Details</a>
                             <a class="dropdown-item" href="#">Personal Details</a>
@@ -41,12 +40,12 @@
                             <a class="dropdown-item" href="#">Saved Baskets</a>
                             <a class="dropdown-item" href="#">Order History</a>
                         </div>
-                    {% endif %}
+                    </li>
+                {% endif %}
 
                     {% if userpermissions == 3 %}
                     <li class="nav-item dropdown show">
-                        <a class="dropdown-toggle nav-link" aria-expanded="true" data-bs-toggle="dropdown"
-                            href="#">Account Manager Options</a>
+                        <a class="dropdown-toggle nav-link" aria-expanded="true" data-bs-toggle="dropdown" href="#">Account Manager Options</a>
                             <div class="dropdown-menu" data-bs-popper="none">
                                 <a class="dropdown-item" href="#">View Accounts</a>
                                 <a class="dropdown-item" href="#">View Statements</a>
@@ -54,10 +53,19 @@
                     </li>
                     {% endif %}
 
+                    {% if userpermissions == 2 %}
+                    <li class="nav-item dropdown show">
+                        <a class="dropdown-toggle nav-link" aria-expanded="true" data-bs-toggle="dropdown" href="#">My Club</a>
+                            <div class="dropdown-menu" data-bs-popper="none">
+                                <a class="dropdown-item" href="{% url 'update_club_rep' club_id=club_id %}">View Club Details</a>
+                                <a class="dropdown-item" href="#">View Statements</a>
+                            </div>
+                    </li>
+                    {% endif %}
+
                     {% if userpermissions == 1 %}
                     <li class="nav-item dropdown show">
-                        <a class="dropdown-toggle nav-link" aria-expanded="true" data-bs-toggle="dropdown"
-                            href="#">Cinema Manager Options</a>
+                        <a class="dropdown-toggle nav-link" aria-expanded="true" data-bs-toggle="dropdown" href="#">Cinema Manager Options</a>
                         <div class="dropdown-menu" data-bs-popper="none">
                             <a class="dropdown-item" href="{% url 'addfilm' %}">Add Film</a>
                             <a class="dropdown-item" href="{% url 'addcinman' %}">Add Cinema Manager</a>

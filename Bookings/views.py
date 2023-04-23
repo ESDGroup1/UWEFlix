@@ -1,5 +1,8 @@
 from django.shortcuts import render, get_object_or_404, redirect
+from CinManager.models import ClubRep
+from web_project import settings
 from .models import Showing, Booking
+import stripe
 
 def check_permissions(request):
     if request.user.is_authenticated:
@@ -18,9 +21,16 @@ def check_permissions(request):
     return userpermission
 
 def add_to_cart(request, showing_id):
+
     # Get the showing object
     showing = get_object_or_404(Showing, id=showing_id)
     userpermissions = check_permissions(request)
+
+    if userpermissions == 2:
+        club_rep = ClubRep.objects.get(user=request.user)
+        club_id = club_rep.club.id
+    else:
+        club_id = 0
 
     if request.method == 'POST':
         # Get the ticket counts from the form data
@@ -90,9 +100,20 @@ def add_to_cart(request, showing_id):
                 latest_booking = Booking.objects.filter(showing=showing, user=request.user).latest('id')
             except Booking.DoesNotExist:
                 latest_booking = Booking.objects.create(showing=showing, user=request.user)
+    # Calculate the total price
+    price = latest_booking.get_price()
 
-            context = {'showing': showing, 'latest_booking': latest_booking, 'userpermissions': userpermissions}
-            return render(request, 'UWEFlix/add_to_cart.html', context)
+    # Create a payment intent with Stripe
+    stripe.api_key = settings.STRIPE_SECRET_KEY
+    intent = stripe.PaymentIntent.create(
+        amount=price * 100,  # Stripe requires the amount in cents
+        currency="gbp",
+        payment_method_types=["card"]
+    )
+
+    # Pass the payment intent ID to the template
+    context = {'showing': showing, 'latest_booking': latest_booking, 'userpermissions': userpermissions, 'club_id': club_id, 'client_secret': intent.client_secret}
+    return render(request, 'UWEFlix/add_to_cart.html', context)
 
 
 def cancel_booking(request, booking_id):
@@ -105,3 +126,24 @@ def cancel_booking(request, booking_id):
     return redirect('home')
 
 
+def book_showing(request):
+    if request.method == 'POST':
+        # Set your secret key: remember to change this to your live secret key in production
+        # See your keys here: https://dashboard.stripe.com/apikeys
+        stripe.api_key = settings.STRIPE_SECRET_KEY
+        
+        # Get the payment token submitted by the form
+        token = request.POST.get('stripeToken')
+        
+        # Create a charge: this will charge the user's card
+        charge = stripe.Charge.create(
+            amount=1000, # amount in cents, change this to the actual amount you want to charge
+            currency='usd',
+            description='Booking a showing',
+            source=token,
+        )
+        
+        # Redirect to a success page
+        return redirect('home')
+    
+    return render(request, 'Bookings/book_showing.html')

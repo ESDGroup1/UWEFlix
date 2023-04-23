@@ -10,5 +10,6 @@ urlpatterns = [
     path('film/<int:film_id>/delete/', views.delete_film, name='delete_film'),
     path('updatefilm/<int:film_id>', views.update_film, name='update_film'),
     path('updateclub/<int:club_id>', views.update_club, name='update_club'),
+    path('club/<int:club_id>/update/', views.update_club_rep, name='update_club_rep'),
     path('clubcreatedsucess/<str:username>/<str:password>/', views.clubcreatedsucess, name='clubcreatedsucess'),
     ]

@@ -28,7 +28,7 @@ class Club(models.Model):
     address = models.CharField(max_length=100)
     contact_number = models.CharField(max_length=100)
     email = models.CharField(max_length=100)
-    discount_rate = models.PositiveIntegerField()
+    discount_rate = models.PositiveIntegerField(default=0)
 
 class ClubRep(models.Model):
     id = models.AutoField(primary_key=True)

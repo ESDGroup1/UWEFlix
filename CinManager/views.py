@@ -59,7 +59,6 @@ def addCinManagers(request):
 
     return render(request, 'UWEFlix/addcinman.html', {'users': users , 'userpermissions': userpermissions})
 
-
 def create_club_view(request):
     userpermissions = check_permissions(request)
 
@@ -71,12 +70,9 @@ def create_club_view(request):
         contact_number = request.POST['contact_number']
         email = request.POST['email']
         discount_rate = request.POST['discount_rate']
-        account_number = request.POST['account_number']
-        cvv = request.POST['cvv']
-        expdate = request.POST['expdate']
         
         # Create new Club instance
-        club = Club(name=name, address=address, contact_number=contact_number, email=email, discount_rate=discount_rate, account_number=account_number, cvv=cvv, expdate=expdate)
+        club = Club(name=name, address=address, contact_number=contact_number, email=email, discount_rate=discount_rate)
         club.save()
         
         # Create new user for club rep
@@ -89,6 +85,10 @@ def create_club_view(request):
 
         user = User.objects.create_user(username=username, password=password, first_name=first_name, last_name=last_name, email=email) #create new user instance with gathered and generated info
         user.save()
+
+        # Add user to Account Managers group
+        group = Group.objects.get(name='Club Representatives')
+        user.groups.add(group)
     
         
         # Create new ClubRep instance and tie it to the new user and club
@@ -102,6 +102,7 @@ def create_club_view(request):
         #send to page which will show the generated credentials to user
         return redirect('clubcreatedsucess', username=username, password=password)
     return render(request, 'UWEFlix/createclub.html', {'userpermissions': userpermissions})
+
 
 def clubcreatedsucess(request,username,password):
     userpermissions = check_permissions(request)
@@ -186,9 +187,6 @@ def update_club(request, club_id):
         club.contact_number = request.POST['contact_number']
         club.email = request.POST['email']
         club.discount_rate = request.POST['discount_rate']
-        club.account_number = request.POST['account_number']
-        club.cvv = request.POST['cvv']
-        club.expdate = request.POST['expdate']
         club.save()
 
         club_rep.user.first_name = request.POST['first_name']
@@ -200,3 +198,31 @@ def update_club(request, club_id):
 
         return redirect('home')
     return render(request, 'UWEFlix/editclub.html', {'club': club, 'club_rep': club_rep, 'userpermissions': userpermissions})
+
+def update_club_rep(request, club_id):
+    userpermissions = check_permissions(request)
+
+    #Find instance of selected club and connect it to club rep
+    club = Club.objects.get(pk=club_id)
+    club_rep = ClubRep.objects.get(club=club)
+
+    print("CLUB ID: ", club_id)
+
+    if request.method == 'POST':
+        
+        #Gather data
+        club.name = request.POST['name']
+        club.address = request.POST['address']
+        club.contact_number = request.POST['contact_number']
+        club.email = request.POST['email']
+        club.save()
+
+        club_rep.user.first_name = request.POST['first_name']
+        club_rep.user.last_name = request.POST['last_name']
+        club_rep.user.email = request.POST['email']
+        club_rep.dateofbirth = request.POST['dateofbirth']
+        club_rep.user.save()
+        club_rep.save()
+
+        return redirect('home')
+    return render(request, 'UWEFlix/editclubrep.html', {'club': club, 'club_rep': club_rep, 'userpermissions': userpermissions, 'club_id':club_id})

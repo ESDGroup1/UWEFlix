@@ -52,21 +52,34 @@ def home(request):
             film.has_showings = False
         else:
             film.has_showings = True
-            
-    # pass the selected date as a context variable
-    print("OG DATE:" , selected_date)
+
+    # set the club_id variable if user has permissions 2
+    if userpermissions == 2:
+        club_rep = ClubRep.objects.get(user=request.user)
+        club_id = club_rep.club.id
+    else:
+        club_id = 0
+
+    print("CLUB ID IS: ",club_id)
+    # pass the selected date and club_id as context variables
     context = {
         'films': films,
         'userpermissions': userpermissions,
         'selected_date': selected_date.strftime('%Y-%m-%d') if selected_date else None,
+        'club_id': club_id
     }
     return render(request, 'UWEFlix/home.html', context)
-
 
 def film_detail_view(request, film_id):
     userpermissions = check_permissions(request)
     
     film = get_object_or_404(Film, id=film_id)
+
+    if userpermissions == 2:
+        club_rep = ClubRep.objects.get(user=request.user)
+        club_id = club_rep.club.id
+    else:
+        club_id = 0
     
     selected_date = request.GET.get('date')
     print("SELECTED DATE:" , selected_date)
@@ -84,17 +97,22 @@ def film_detail_view(request, film_id):
     else:
         showings = Showing.objects.filter(film=film)
     
-    return render(request, 'UWEFlix/filmdetail.html', {'film': film, 'showings': showings, 'userpermissions': userpermissions, 'selected_date': selected_date})
-
+    return render(request, 'UWEFlix/filmdetail.html', {'film': film, 'showings': showings, 'userpermissions': userpermissions, 'selected_date': selected_date, 'club_id': club_id})
 
 
 def view_all_clubs(request):
     userpermissions = check_permissions(request)
 
+    if userpermissions == 2:
+        club_rep = ClubRep.objects.get(user=request.user)
+        club_id = club_rep.club.id
+    else:
+        club_id = 0
+
     #gathers data from db
     clubs = Club.objects.all()
     club_reps = ClubRep.objects.all()
-    return render(request, 'UWEFlix/allclubs.html', {'clubs': clubs, 'club_reps': club_reps, 'userpermissions': userpermissions})
+    return render(request, 'UWEFlix/allclubs.html', {'clubs': clubs, 'club_reps': club_reps, 'userpermissions': userpermissions, 'club_id': club_id})
 
 #Standard django logout
 def logout_view(request):
