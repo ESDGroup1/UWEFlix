@@ -3,8 +3,10 @@ from django.urls import reverse
 from CinManager.models import ClubRep
 from web_project import settings
 from .models import Showing, Booking
+from Accounts.models import PaymentDetails
 import stripe
 
+stripe.api_key = settings.STRIPE_SECRET_KEY
 
 def check_permissions(request):
     if request.user.is_authenticated:
@@ -121,16 +123,35 @@ def cancel_booking(request, booking_id):
 
 
 def payment(request, booking_id):
-    if request.method == 'POST':
-        # Get the user's cart data
-        try:
-            latest_booking = Booking.objects.filter(
-                user=request.user, purchased=False).latest('id')
-        except Booking.DoesNotExist:
-            return redirect('index')
+    userpermissions = check_permissions(request)
 
+    # Get the booking object
+    booking = get_object_or_404(Booking, id=booking_id, user=request.user, purchased=False)
+
+    # Get the user's payment details
+    try:
+        payment_details = PaymentDetails.objects.get(user=request.user)
+
+        stripe.api_key = settings.STRIPE_SECRET_KEY
+
+        customer = stripe.Customer.create(
+            email=request.user.email
+        )
+
+        payment_data = {
+            'customer': customer['id'],
+        }
+
+        # Store the Stripe customer ID in the PaymentDetails object
+        payment_details.stripe_customer_id = customer['id']
+        payment_details.save()
+    except PaymentDetails.DoesNotExist:
+        payment_data = {}
+
+    if request.method == 'POST':
         # Calculate the total price
-        price = latest_booking.get_price()
+        price = booking.get_price()
+        print("FINAL PRICE", price)
 
         # Create a new Stripe Checkout Session
         stripe.api_key = settings.STRIPE_SECRET_KEY
@@ -140,22 +161,22 @@ def payment(request, booking_id):
                 'price_data': {
                     'currency': 'gbp',
                     'product_data': {
-                        'name': 'Ticket for ' + latest_booking.showing.film.title,
-                        'description': 'Showing at ' + str(latest_booking.showing.date),
+                        'name': 'Ticket for ' + booking.showing.film.title,
+                        'description': 'Showing at ' + str(booking.showing.date),
                     },
                     'unit_amount': int(price) * 100,
                 },
-                'quantity': latest_booking.get_total_tickets(),
+                'quantity': 1,
             }],
             mode='payment',
             success_url=request.build_absolute_uri(reverse('home')),
             cancel_url=request.build_absolute_uri(reverse('home')),
+            **payment_data,
         )
 
-
-        # Store the Session ID in the latest booking object
-        latest_booking.stripe_session_id = session.id
-        latest_booking.save()
+        # Store the Session ID in the booking object
+        booking.stripe_session_id = session.id
+        booking.save()
 
         # Render the Stripe Checkout page
         context = {'session_id': session.id}
