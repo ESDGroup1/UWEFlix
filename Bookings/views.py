@@ -1,3 +1,4 @@
+from pyexpat.errors import messages
 from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse
 from CinManager.models import ClubRep
@@ -25,7 +26,6 @@ def check_permissions(request):
         return redirect('Login')
     return userpermission
 
-
 def add_to_cart(request, showing_id):
     # Get the showing object
     showing = get_object_or_404(Showing, id=showing_id)
@@ -36,6 +36,9 @@ def add_to_cart(request, showing_id):
         club_id = club_rep.club.id
     else:
         club_id = 0
+
+    # Calculate the available seats
+    available_seats = showing.screen.capacity - showing.bookedseats
 
     # Try to get the latest unpurchased booking for the current user and showing
     latest_booking = Booking.objects.filter(showing=showing, user=request.user, purchased=False).last()
@@ -78,7 +81,8 @@ def add_to_cart(request, showing_id):
         if book_showing:
             if latest_booking:
                 # Render the same page with the latest booking for the current user and showing
-                context = {'showing': showing, 'latest_booking': latest_booking, 'userpermissions': userpermissions, 'club_id': club_id}
+                ticketcount = latest_booking.adult_tickets + latest_booking.student_tickets + latest_booking.child_tickets
+                context = {'showing': showing, 'latest_booking': latest_booking, 'userpermissions': userpermissions, 'club_id': club_id, 'available_seats': available_seats, 'ticketcount': ticketcount}
                 return render(request, 'UWEFlix/add_to_cart.html', context)
             else:
                 # Create a new Booking object with default ticket counts
@@ -90,9 +94,10 @@ def add_to_cart(request, showing_id):
                     child_tickets=0,
                     purchased=False
                 )
+                ticketcount = latest_booking.adult_tickets + latest_booking.student_tickets + latest_booking.child_tickets
 
             # Render the same page with the new Booking object
-            context = {'showing': showing, 'latest_booking': latest_booking, 'userpermissions': userpermissions, 'club_id': club_id}
+            context = {'showing': showing, 'latest_booking': latest_booking, 'userpermissions': userpermissions, 'club_id': club_id, 'available_seats': available_seats, 'ticketcount': ticketcount}
             return render(request, 'UWEFlix/add_to_cart.html', context)
 
         else:
@@ -100,7 +105,8 @@ def add_to_cart(request, showing_id):
             if not latest_booking:
                 latest_booking = Booking.objects.create(showing=showing, user=request.user)
 
-            context = {'showing': showing, 'latest_booking': latest_booking, 'userpermissions': userpermissions, 'club_id': club_id}
+            ticketcount = latest_booking.adult_tickets + latest_booking.student_tickets + latest_booking.child_tickets
+            context = {'showing': showing, 'latest_booking': latest_booking, 'available_seats': available_seats, 'userpermissions': userpermissions, 'club_id': club_id, 'ticketcount': ticketcount}
             return render(request, 'UWEFlix/add_to_cart.html', context)
 
 

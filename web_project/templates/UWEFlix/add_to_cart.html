@@ -8,6 +8,18 @@
             <p>{{ showing.film.trailer_description }}</p>
         </div>
         <div class="col-md-6">
+            <table class="table">
+                <tr>
+                    <th>Available Seats:</th>
+                    <td>{{ available_seats }}</td>
+                </tr>
+                <tr>
+                    <th>Tickets in this booking:</th>
+                    <td>{{ ticketcount }}</td>
+                </tr>
+            </table>
+        </div>
+        <div class="col-md-6">
             <form method="post">
                 {% csrf_token %}
                 <div class="form-group">
@@ -25,8 +37,29 @@
                     <input type="number" class="form-control" name="child_tickets"
                         value="{{ latest_booking.child_tickets }}" min="0">
                 </div>
-                <button type="submit" class="btn btn-primary mt-3">Update Cart</button>
+                <button type="submit" class="btn btn-primary mt-3" id="update-cart-btn">Update Cart</button>
             </form>
+
+            <!-- Modal -->
+            <div class="modal fade" id="not-enough-seats-modal" tabindex="-1" role="dialog"
+                aria-labelledby="notEnoughSeatsModalLabel" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="notEnoughSeatsModalLabel">Not Enough Seats</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <p>Sorry, there are not enough seats available for your booking. Please reduce the number of tickets and try again.</p>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
             
             <!-- Button trigger modal -->
             <button type="button" class="btn btn-danger mt-3" data-toggle="modal" data-target="#cancelModal">Cancel Booking</button>
@@ -56,10 +89,16 @@
                 </div>
             </div>
 
+            {% if available_seats >= ticketcount %}
             <form method="post" action="{% url 'payment' booking_id=latest_booking.id %}">
                 {% csrf_token %}
                 <button type="submit" class="btn btn-success mt-3">Book Showing</button>
             </form>
+            {% else %}
+            <div class="col-md-6">
+            <button type="button" class="btn btn-success mt-3" data-toggle="modal" data-target="#not-enough-seats-modal">Book Showing</button>
+            </div>
+            {% endif %}
         </div>
     </div>
 
