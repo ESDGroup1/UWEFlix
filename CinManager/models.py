@@ -1,4 +1,5 @@
 from django.db import models
+from django.core.validators import MaxValueValidator
 from django.contrib.auth.models import User
 from datetime import datetime
 
@@ -14,7 +15,7 @@ class Film(models.Model):
 class Screen(models.Model):
     id = models.AutoField(primary_key=True)
     number = models.PositiveIntegerField()
-    capacity = models.PositiveIntegerField()
+    capacity = models.PositiveIntegerField(validators=[MaxValueValidator(300)])
 
 class Showing(models.Model):
     id = models.AutoField(primary_key=True)
