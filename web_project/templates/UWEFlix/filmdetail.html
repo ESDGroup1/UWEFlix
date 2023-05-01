@@ -27,6 +27,7 @@
                     <tr>
                         <th>Date and Time</th>
                         <th>Screen</th>
+                        <th>Available Seats</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
@@ -35,17 +36,43 @@
                     <tr>
                         <td>{{ showing.date|date:'D d M Y H:i' }}</td>
                         <td>Screen {{ showing.screen.number }}</td>
+                        <td>{{ showing.available_seats }}</td>
                         <td>
+                            {% if showing.available_seats > 0 %}
                             <form method="post" action="{% url 'add_to_cart' showing_id=showing.id %}">
                                 {% csrf_token %}
                                 <button type="submit" class="btn btn-primary btn-sm">Book Showing</button>
-                            </form>                            
+                            </form>
+                            {% else %}
+                            <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal"
+                                data-bs-target="#no-seats-modal">
+                                Book Showing
+                            </button>
+                            {% endif %}
                         </td>
                     </tr>
                     {% endfor %}
                 </tbody>
             </table>
             {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="no-seats-modal" tabindex="-1" aria-labelledby="no-seats-modal-label" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="no-seats-modal-label">Sorry, no available seats</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                There are no available seats for this showing. Please select a different showing.
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
         </div>
     </div>
 </div>

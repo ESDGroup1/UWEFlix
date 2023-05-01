@@ -3,6 +3,8 @@ from django.contrib.auth import logout
 from django.shortcuts import get_object_or_404, redirect, render
 from CinManager.models import Club, ClubRep, Film, Screen, Showing
 from datetime import datetime
+from django.http import HttpResponseRedirect
+from django.urls import reverse
 
 def check_permissions(request):
     if request.user.is_authenticated:
@@ -96,9 +98,12 @@ def film_detail_view(request, film_id):
             showings = Showing.objects.filter(film=film)
     else:
         showings = Showing.objects.filter(film=film)
-    
-    return render(request, 'UWEFlix/filmdetail.html', {'film': film, 'showings': showings, 'userpermissions': userpermissions, 'selected_date': selected_date, 'club_id': club_id})
 
+    # get available seats for each showing
+    for showing in showings:
+        showing.available_seats = showing.screen.capacity - showing.bookedseats if showing.bookedseats else showing.screen.capacity
+
+    return render(request, 'UWEFlix/filmdetail.html', {'film': film, 'showings': showings, 'userpermissions': userpermissions, 'selected_date': selected_date, 'club_id': club_id})
 
 def view_all_clubs(request):
     userpermissions = check_permissions(request)

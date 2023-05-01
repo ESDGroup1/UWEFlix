@@ -37,52 +37,72 @@ def add_to_cart(request, showing_id):
     else:
         club_id = 0
 
-    # Try to get the latest booking for the current user and showing that has not been purchased
-    try:
-        latest_booking = Booking.objects.filter(
-            showing=showing, user=request.user, purchased=False).latest('id')
-    except Booking.DoesNotExist:
-        # If no booking exists, create a new one with default ticket counts
-        latest_booking = Booking.objects.create(
-            showing=showing,
-            user=request.user,
-            adult_tickets=0,
-            student_tickets=0,
-            child_tickets=0,
-            purchased=False
-        )
+    # Try to get the latest unpurchased booking for the current user and showing
+    latest_booking = Booking.objects.filter(showing=showing, user=request.user, purchased=False).last()
 
-    # If the request method is POST, update the existing or new Booking object with the new ticket counts
     if request.method == 'POST':
         # Get the ticket counts from the form data
         adult_tickets = int(request.POST.get('adult_tickets', 0))
         student_tickets = int(request.POST.get('student_tickets', 0))
-        child_tickets = int(request.POST.get('child_tickets', 0))
-
-        # Update the existing or new Booking object with the new ticket counts
-        latest_booking.adult_tickets = adult_tickets
-        latest_booking.student_tickets = student_tickets
-        latest_booking.child_tickets = child_tickets
-        latest_booking.save()
+        child_tickets = int(request.POST.get('child_tickets', 0))  # set to 0 if not provided
 
         # Calculate the total price
-        price = latest_booking.get_price()
+        price = (adult_tickets * 10) + (student_tickets * 8) + (child_tickets * 6)
 
-        # Pass the updated booking object and total price to the template
-        context = {'showing': showing, 'latest_booking': latest_booking, 'price': price, 'userpermissions': userpermissions, 'club_id': club_id}
-        return render(request, 'UWEFlix/add_to_cart.html', context)
+        if latest_booking:
+            # Update the existing Booking object with the new ticket counts and price
+            latest_booking.adult_tickets = adult_tickets
+            latest_booking.student_tickets = student_tickets
+            latest_booking.child_tickets = child_tickets
+            latest_booking.price = price
+            latest_booking.save()
+        else:
+            # Create a new Booking object with the ticket counts and price
+            booking = Booking.objects.create(
+                showing=showing,
+                user=request.user,
+                adult_tickets=adult_tickets,
+                student_tickets=student_tickets,
+                child_tickets=child_tickets,
+                price=price,
+                purchased=False
+            )
+
+        # Redirect to the same page to avoid duplicate form submissions
+        return redirect('add_to_cart', showing_id=showing_id)
 
     else:
-        # Pre-populate the ticket counts on the form if they already exist in the latest booking
-        adult_tickets = latest_booking.adult_tickets
-        student_tickets = latest_booking.student_tickets
-        child_tickets = latest_booking.child_tickets
+        # Check if the "Book Showing" button was clicked
+        book_showing = request.GET.get('book_showing')
 
-        # Pass the showing and latest booking objects to the template, along with the pre-populated ticket counts
-        context = {'showing': showing, 'latest_booking': latest_booking, 'adult_tickets': adult_tickets,
-                'student_tickets': student_tickets, 'child_tickets': child_tickets,
-                'userpermissions': userpermissions, 'club_id': club_id}
-        return render(request, 'UWEFlix/add_to_cart.html', context)
+        if book_showing:
+            if latest_booking:
+                # Render the same page with the latest booking for the current user and showing
+                context = {'showing': showing, 'latest_booking': latest_booking, 'userpermissions': userpermissions, 'club_id': club_id}
+                return render(request, 'UWEFlix/add_to_cart.html', context)
+            else:
+                # Create a new Booking object with default ticket counts
+                latest_booking = Booking.objects.create(
+                    showing=showing,
+                    user=request.user,
+                    adult_tickets=0,
+                    student_tickets=0,
+                    child_tickets=0,
+                    purchased=False
+                )
+
+            # Render the same page with the new Booking object
+            context = {'showing': showing, 'latest_booking': latest_booking, 'userpermissions': userpermissions, 'club_id': club_id}
+            return render(request, 'UWEFlix/add_to_cart.html', context)
+
+        else:
+            # Render the same page with the latest booking for the current user and showing, or create a new one if none exists
+            if not latest_booking:
+                latest_booking = Booking.objects.create(showing=showing, user=request.user)
+
+            context = {'showing': showing, 'latest_booking': latest_booking, 'userpermissions': userpermissions, 'club_id': club_id}
+            return render(request, 'UWEFlix/add_to_cart.html', context)
+
 
 
 def cancel_booking(request, booking_id):
