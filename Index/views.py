@@ -3,8 +3,8 @@ from django.contrib.auth import logout
 from django.shortcuts import get_object_or_404, redirect, render
 from CinManager.models import Club, ClubRep, Film, Screen, Showing
 from datetime import datetime
-from django.http import HttpResponseRedirect
-from django.urls import reverse
+from Bookings.models import Booking
+from django.utils import timezone
 
 def check_permissions(request):
     if request.user.is_authenticated:
@@ -126,3 +126,10 @@ def logout_view(request):
 
 def error_404(request, exception):
     return render(request, 'UWEFlix/error_404.html', {}, status=404)
+
+def purchased_bookings(request):
+    # Get all purchased bookings for the current user
+    purchased_bookings = Booking.objects.filter(user=request.user, purchased=True, showing__date__gt=timezone.now().date())
+
+    context = {'bookings': purchased_bookings}
+    return render(request, 'UWEFlix/purchased_bookings.html', context)

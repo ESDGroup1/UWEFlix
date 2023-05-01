@@ -1,0 +1,35 @@
+{% extends 'UWEFlix/layout.html' %}
+
+{% block content %}
+<div class="container">
+    <h1>My Showings</h1>
+    {% if bookings %}
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Film</th>
+                    <th>Showing</th>
+                    <th>Adult Tickets</th>
+                    <th>Student Tickets</th>
+                    <th>Child Tickets</th>
+                    <th>Price</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for booking in bookings %}
+                    <tr>
+                        <td>{{ booking.showing.film.title }}</td>
+                        <td>{{ booking.showing.date }}</td>
+                        <td>{{ booking.adult_tickets }}</td>
+                        <td>{{ booking.student_tickets }}</td>
+                        <td>{{ booking.child_tickets }}</td>
+                        <td>£{{ booking.price }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>You have no bookings coming up.</p>
+    {% endif %}
+</div>
+{% endblock %}
