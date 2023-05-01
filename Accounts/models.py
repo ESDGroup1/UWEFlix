@@ -7,8 +7,6 @@ from CinManager.models import *
 class Account(models.Model):
     id = models.AutoField(primary_key=True, unique=True)
     club = models.ForeignKey(Club, on_delete=models.DO_NOTHING)
-    cvv = models.CharField(max_length=3)
-    expdate = models.DateField(default=datetime.now)
     balance = models.IntegerField(default=0)
 
 class Receipt(models.Model):

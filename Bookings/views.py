@@ -170,7 +170,7 @@ def payment(request, booking_id):
             }],
             mode='payment',
             success_url=request.build_absolute_uri(reverse('home')),
-            cancel_url=request.build_absolute_uri(reverse('home')),
+            cancel_url = request.build_absolute_uri(reverse('add_to_cart', args=[booking.showing.id])),
             **payment_data,
         )
 
@@ -184,3 +184,12 @@ def payment(request, booking_id):
 
     else:
         return redirect('index')
+
+
+
+
+
+
+
+
+

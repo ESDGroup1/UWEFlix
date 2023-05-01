@@ -1,0 +1,36 @@
+{% extends "UWEFlix/layout.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1 class="text-center mb-4">List of Clubs & Accounts</h1>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Address</th>
+                <th>Contact Number</th>
+                <th>Email</th>
+                <th>Discount Rate</th>
+                <th>Account</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for club in club_data %}
+            <tr>
+                <td>{{ club.club.name }}</td>
+                <td>{{ club.club.address }}</td>
+                <td>{{ club.club.contact_number }}</td>
+                <td>{{ club.club.email }}</td>
+                <td>{{ club.club.discount_rate }} % </td>
+                <td>
+                    {% if club.button_text == 'View Account' %}
+                        <a class="btn btn-primary" href="{% url 'view_account' club_id=club.club.id %}">View Account</a>
+                    {% else %}
+                        <a class="btn btn-primary" href="{% url 'create_or_view_account' club_id=club.club.id %}">Create Account</a>
+                    {% endif %}
+                </td>                
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

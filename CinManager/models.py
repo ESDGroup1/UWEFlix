@@ -21,6 +21,7 @@ class Showing(models.Model):
     film = models.ForeignKey(Film, on_delete=models.DO_NOTHING)
     screen = models.ForeignKey(Screen, on_delete=models.DO_NOTHING)
     date = models.DateTimeField()
+    bookedseats = models.IntegerField(default=0)
 
 class Club(models.Model):
     id = models.AutoField(primary_key=True, unique=True)

@@ -15,8 +15,11 @@
             </form>
             <form method="post" action="{% url 'login_guest' %}">
                 {% csrf_token %}
-                <button type="submit" class="btn btn-secondary btn-block mt-2" style="background-color: #2788e4;">Log in as guest</button>
-            </form>            
+                <button type="submit" class="btn btn-secondary btn-sm btn-block mt-2" style="background-color: #2788e4;">Log in as guest</button>
+            </form>
+            <div class="text-right mt-4">
+                <a href="/admin/" class="btn btn-sm btn-outline-dark" target="_blank">Admin</a>
+            </div>         
         </div>
     </div>
 </div>
