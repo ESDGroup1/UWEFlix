@@ -1,10 +1,11 @@
+from decimal import Decimal
 from pyexpat.errors import messages
 from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse
 from CinManager.models import ClubRep
 from web_project import settings
 from .models import Showing, Booking
-from Accounts.models import PaymentDetails
+from Accounts.models import PaymentDetails, Account
 import stripe
 
 stripe.api_key = settings.STRIPE_SECRET_KEY
@@ -188,6 +189,39 @@ def payment(request, booking_id):
 
     else:
         return redirect('index')
+    
+def clubrep_payment(request, booking_id):
+    try:
+        booking = Booking.objects.get(id=booking_id, user=request.user, purchased=False)
+        clubrep = ClubRep.objects.get(user=request.user)
+        account = Account.objects.get(club=clubrep.club)
+        
+        if request.method == 'POST':
+            # Calculate discount percentage and apply it to the price
+            discount_rate = clubrep.club.discount_rate
+            discount_percentage = Decimal(discount_rate) / 100
+            discounted_price = (booking.price * (Decimal(1) - discount_percentage)).quantize(Decimal('.01'))
+            booking.price = discounted_price
+
+            # Deduct the price from the account balance
+            account.balance -= discounted_price
+            account.save()
+
+            # Update the bookedseats attribute of the showing object
+            showing = booking.showing
+            showing.bookedseats += booking.get_total_tickets()
+            showing.save()
+            
+            return redirect('payment_success', booking_id=booking.id)
+        
+        context = {'booking': booking, 'account': account}
+        return render(request, 'UWEFlix/clubrep_payment.html', context)
+        
+    except Account.DoesNotExist:
+        context = {'message': 'Sorry no account for this club was found. Please contact your Account Manager.'}
+        return render(request, 'UWEFlix/no_account_found.html', context)
+
+
 
 
 def payment_success(request, booking_id):

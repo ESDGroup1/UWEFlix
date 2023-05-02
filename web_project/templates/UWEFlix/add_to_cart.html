@@ -22,6 +22,13 @@
         <div class="col-md-6">
             <form method="post">
                 {% csrf_token %}
+                {% if userpermissions == 2 %}
+                <div class="form-group">
+                    <label for="student_tickets">Student tickets (minimum 10):</label>
+                    <input type="number" class="form-control" name="student_tickets"
+                        value="{{ latest_booking.student_tickets }}" min="10">
+                </div>
+                {% else %}
                 <div class="form-group">
                     <label for="adult_tickets">Adult tickets:</label>
                     <input type="number" class="form-control" name="adult_tickets"
@@ -37,8 +44,10 @@
                     <input type="number" class="form-control" name="child_tickets"
                         value="{{ latest_booking.child_tickets }}" min="0">
                 </div>
+                {% endif %}
                 <button type="submit" class="btn btn-primary mt-3" id="update-cart-btn">Update Cart</button>
             </form>
+
 
             <!-- Modal -->
             <div class="modal fade" id="not-enough-seats-modal" tabindex="-1" role="dialog"
@@ -52,7 +61,8 @@
                             </button>
                         </div>
                         <div class="modal-body">
-                            <p>Sorry, there are not enough seats available for your booking. Please reduce the number of tickets and try again.</p>
+                            <p>Sorry, there are not enough seats available for your booking. Please reduce the number of
+                                tickets and try again.</p>
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
@@ -60,13 +70,14 @@
                     </div>
                 </div>
             </div>
-            
+
             <!-- Button trigger modal -->
-            <button type="button" class="btn btn-danger mt-3" data-toggle="modal" data-target="#cancelModal">Cancel Booking</button>
-            
+            <button type="button" class="btn btn-danger mt-3" data-toggle="modal" data-target="#cancelModal">Cancel
+                Booking</button>
+
             <!-- Modal -->
-            <div class="modal fade" id="cancelModal" tabindex="-1" role="dialog"
-                aria-labelledby="cancelModalLabel" aria-hidden="true">
+            <div class="modal fade" id="cancelModal" tabindex="-1" role="dialog" aria-labelledby="cancelModalLabel"
+                aria-hidden="true">
                 <div class="modal-dialog" role="document">
                     <div class="modal-content">
                         <div class="modal-header">
@@ -76,7 +87,8 @@
                             </button>
                         </div>
                         <div class="modal-body">
-                            Are you sure you want to cancel your unpaid booking for {{ showing.film.title }} on {{showing.date }}?
+                            Are you sure you want to cancel your unpaid booking for {{ showing.film.title }} on
+                            {{showing.date }}?
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
@@ -88,16 +100,34 @@
                     </div>
                 </div>
             </div>
+            
+            {% if userpermissions == 2 %}
+                <!-- CLUB REPRESENTATIVE SECTION -->
+                {% if available_seats >= ticketcount %}
+                <form method="post" action="{% url 'clubrep_payment' booking_id=latest_booking.id %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-success mt-3">REP Showing</button>
+                </form>
+                {% else %}
+                <div class="col-md-6">
+                    <button type="button" class="btn btn-success mt-3" data-toggle="modal"
+                        data-target="#not-enough-seats-modal">REP Showing</button>
+                </div>
+                {% endif %}
 
-            {% if available_seats >= ticketcount %}
-            <form method="post" action="{% url 'payment' booking_id=latest_booking.id %}">
-                {% csrf_token %}
-                <button type="submit" class="btn btn-success mt-3">Book Showing</button>
-            </form>
-            {% else %}
-            <div class="col-md-6">
-            <button type="button" class="btn btn-success mt-3" data-toggle="modal" data-target="#not-enough-seats-modal">Book Showing</button>
-            </div>
+                {% else %}
+                <!-- NORMAL USER SECTION -->
+                {% if available_seats >= ticketcount %}
+                <form method="post" action="{% url 'payment' booking_id=latest_booking.id %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-success mt-3">Book Showing</button>
+                </form>
+                {% else %}
+                <div class="col-md-6">
+                    <button type="button" class="btn btn-success mt-3" data-toggle="modal"
+                        data-target="#not-enough-seats-modal">Book Showing</button>
+                </div>
+                {% endif %}
             {% endif %}
         </div>
     </div>
@@ -135,4 +165,3 @@
     {% endif %}
 </div>
 {% endblock %}
-
