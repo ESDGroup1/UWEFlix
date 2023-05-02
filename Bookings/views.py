@@ -2,7 +2,7 @@ from decimal import Decimal
 from pyexpat.errors import messages
 from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse
-from CinManager.models import ClubRep
+from CinManager.models import ClubRep, Club
 from web_project import settings
 from .models import Showing, Booking
 from Accounts.models import PaymentDetails, Account
@@ -31,10 +31,12 @@ def add_to_cart(request, showing_id):
     # Get the showing object
     showing = get_object_or_404(Showing, id=showing_id)
     userpermissions = check_permissions(request)
+    price = 0
 
     if userpermissions == 2:
         club_rep = ClubRep.objects.get(user=request.user)
         club_id = club_rep.club.id
+        club = get_object_or_404(Club, id=club_id)
     else:
         club_id = 0
 
@@ -50,8 +52,18 @@ def add_to_cart(request, showing_id):
         student_tickets = int(request.POST.get('student_tickets', 0))
         child_tickets = int(request.POST.get('child_tickets', 0))  # set to 0 if not provided
 
-        # Calculate the total price
-        price = (adult_tickets * 10) + (student_tickets * 8) + (child_tickets * 6)
+        if userpermissions == 2:
+            print("YES 2")
+            discount_rate = club.discount_rate / 100
+            print("DISCOUNT RATE:", discount_rate)
+            priceog = (adult_tickets * 10) + (student_tickets * 8) + (child_tickets * 6)
+            print("PRICE OG:", priceog)
+            price = priceog - (priceog * discount_rate)
+            print("PRICE:",price)
+        else:
+            # Calculate the total price
+            print("NOT 2")
+            price = (adult_tickets * 10) + (student_tickets * 8) + (child_tickets * 6)
 
         if latest_booking:
             # Update the existing Booking object with the new ticket counts and price
@@ -197,20 +209,9 @@ def clubrep_payment(request, booking_id):
         account = Account.objects.get(club=clubrep.club)
         
         if request.method == 'POST':
-            # Calculate discount percentage and apply it to the price
-            discount_rate = clubrep.club.discount_rate
-            discount_percentage = Decimal(discount_rate) / 100
-            discounted_price = (booking.price * (Decimal(1) - discount_percentage)).quantize(Decimal('.01'))
-            booking.price = discounted_price
-
             # Deduct the price from the account balance
-            account.balance -= discounted_price
+            account.balance -= booking.price
             account.save()
-
-            # Update the bookedseats attribute of the showing object
-            showing = booking.showing
-            showing.bookedseats += booking.get_total_tickets()
-            showing.save()
             
             return redirect('payment_success', booking_id=booking.id)
         

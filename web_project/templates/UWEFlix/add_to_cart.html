@@ -100,34 +100,60 @@
                     </div>
                 </div>
             </div>
-            
-            {% if userpermissions == 2 %}
-                <!-- CLUB REPRESENTATIVE SECTION -->
-                {% if available_seats >= ticketcount %}
-                <form method="post" action="{% url 'clubrep_payment' booking_id=latest_booking.id %}">
-                    {% csrf_token %}
-                    <button type="submit" class="btn btn-success mt-3">REP Showing</button>
-                </form>
-                {% else %}
-                <div class="col-md-6">
-                    <button type="button" class="btn btn-success mt-3" data-toggle="modal"
-                        data-target="#not-enough-seats-modal">REP Showing</button>
-                </div>
-                {% endif %}
 
-                {% else %}
-                <!-- NORMAL USER SECTION -->
-                {% if available_seats >= ticketcount %}
-                <form method="post" action="{% url 'payment' booking_id=latest_booking.id %}">
-                    {% csrf_token %}
-                    <button type="submit" class="btn btn-success mt-3">Book Showing</button>
-                </form>
-                {% else %}
-                <div class="col-md-6">
-                    <button type="button" class="btn btn-success mt-3" data-toggle="modal"
-                        data-target="#not-enough-seats-modal">Book Showing</button>
+            <!-- Modal CONFIRM-->
+            <div class="modal fade" id="confirmModal" tabindex="-1" role="dialog" aria-labelledby="confirmModalLabel"
+                aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="confirmModalLabel">Confirm Booking</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            Are you sure you want to Confirm your unpaid booking for {{ showing.film.title }} on {{ showing.date }} for £{{ latest_booking.price }}?
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <form method="post" action="{% url 'clubrep_payment' booking_id=latest_booking.id %}">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-success mt-3 float-right">Yes, Confirm my showing!</button>
+                            </form>
+                        </div>
+                    </div>
                 </div>
-                {% endif %}
+            </div>
+
+
+            {% if userpermissions == 2 %}
+            <!-- CLUB REPRESENTATIVE SECTION -->
+            {% if available_seats >= ticketcount %}
+            <!-- Button trigger modal -->
+            <div class="col-md-6">
+                <button type="button" class="btn btn-success mt-3" data-toggle="modal" data-target="#confirmModal">Book Showing</button>
+            </div>
+            {% else %}
+            <div class="col-md-6">
+                <button type="button" class="btn btn-success mt-3" data-toggle="modal"
+                    data-target="#not-enough-seats-modal">Book Showing</button>
+            </div>
+            {% endif %}
+
+            {% else %}
+            <!-- NORMAL USER SECTION -->
+            {% if available_seats >= ticketcount %}
+            <form method="post" action="{% url 'payment' booking_id=latest_booking.id %}">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-success mt-3">Book Showing</button>
+            </form>
+            {% else %}
+            <div class="col-md-6">
+                <button type="button" class="btn btn-success mt-3" data-toggle="modal"
+                    data-target="#not-enough-seats-modal">Book Showing</button>
+            </div>
+            {% endif %}
             {% endif %}
         </div>
     </div>
