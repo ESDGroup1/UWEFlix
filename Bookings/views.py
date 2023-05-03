@@ -123,8 +123,6 @@ def add_to_cart(request, showing_id):
             context = {'showing': showing, 'latest_booking': latest_booking, 'available_seats': available_seats, 'userpermissions': userpermissions, 'club_id': club_id, 'ticketcount': ticketcount}
             return render(request, 'UWEFlix/add_to_cart.html', context)
 
-
-
 def cancel_booking(request, booking_id):
     booking = get_object_or_404(
         Booking, id=booking_id, user=request.user, purchased=False)

@@ -29,6 +29,19 @@ class PersonalReceipt(models.Model):
     child_tickets = models.PositiveIntegerField(default=0)
     price = models.DecimalField(max_digits=6, decimal_places=2)
 
+class ClubReceipt(models.Model):
+    id = models.AutoField(primary_key=True, unique=True)
+    account = models.ForeignKey(Account, on_delete=models.DO_NOTHING)
+    price = models.DecimalField(max_digits=6, decimal_places=2)
+    datetime = models.DateTimeField(default=datetime.now)
+
+class Statement(models.Model):
+    id = models.AutoField(primary_key=True, unique=True)
+    account = models.ForeignKey(Account, on_delete=models.DO_NOTHING)
+    startdate = models.DateField(default=datetime.now)
+    enddate = models.DateField(default=datetime.now)
+
+
 class PaymentDetails(models.Model):
     id = models.AutoField(primary_key=True, unique=True)
     user = models.ForeignKey(User, on_delete=models.DO_NOTHING)

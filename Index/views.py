@@ -168,3 +168,4 @@ def delete_account(request):
         logout(request)
         return redirect('logout')
     return render(request, 'UWEFlix/delete_account_modal.html')
+

@@ -1,0 +1,34 @@
+{% extends 'UWEFlix/layout.html' %}
+
+{% block content %}
+<h1>My Personal Receipts</h1>
+
+{% if receipts %}
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Date of Purchase</th>
+                <th>Showing</th>
+                <th>Adult Tickets</th>
+                <th>Student Tickets</th>
+                <th>Child Tickets</th>
+                <th>Price</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for receipt in receipts %}
+            <tr>
+                <td>{{ receipt.date }}</td>
+                <td>{{ receipt.showing.film.title }} on {{ receipt.showing.date }}</td>
+                <td>{{ receipt.adult_tickets }}</td>
+                <td>{{ receipt.student_tickets }}</td>
+                <td>{{ receipt.child_tickets }}</td>
+                <td>£{{ receipt.price }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% else %}
+    <p>No personal receipts available.</p>
+{% endif %}
+{% endblock %}

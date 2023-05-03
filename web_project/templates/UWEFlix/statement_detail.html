@@ -1,0 +1,34 @@
+{% extends 'UWEFlix/layout.html' %}
+
+{% block content %}
+
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card mb-5">
+            <div class="card-header">
+                <h1 class="card-title">Statement for {{ statement.account.club.name }} ({{ statement.startdate }} - {{ statement.enddate }})</h1>
+            </div>
+            <div class="card-body">
+                <h2>Receipts</h2>
+                <ul class="list-group mb-3">
+                    {% for receipt in receipts %}
+                    <li class="list-group-item">{{ receipt.date }} - {{ receipt.showing }} - Adult tickets: {{
+                        receipt.adult_tickets }} - Student tickets: {{ receipt.student_tickets }} - Child tickets: {{
+                        receipt.child_tickets }} - Price: £{{ receipt.price }}</li>
+                    {% empty %}
+                    <li class="list-group-item">No receipts available.</li>
+                    {% endfor %}
+                </ul>
+                <h2>Club Receipts</h2>
+                <ul class="list-group">
+                    {% for club_receipt in club_receipts %}
+                    <li class="list-group-item">{{ club_receipt.datetime }} - Price: £{{ club_receipt.price }}</li>
+                    {% empty %}
+                    <li class="list-group-item">No club receipts available.</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

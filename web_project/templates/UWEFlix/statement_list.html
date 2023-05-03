@@ -1,0 +1,18 @@
+{% extends 'UWEFlix/layout.html' %}
+
+{% block content %}
+    <div class="container mt-5">
+        <h1 class="mb-4">All Statements</h1>
+        <ul class="list-group">
+            {% for statement in statements %}
+                <li class="list-group-item">
+                    <a href="{% url 'statement_detail' statement.id %}">
+                        Statement for {{ statement.account.club.name }} ({{ statement.startdate }} - {{ statement.enddate }})
+                    </a>
+                </li>
+            {% empty %}
+                <li class="list-group-item">No statements available.</li>
+            {% endfor %}
+        </ul>
+    </div>
+{% endblock %}
