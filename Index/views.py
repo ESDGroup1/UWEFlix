@@ -139,21 +139,27 @@ def purchased_bookings(request):
     context = {'bookings': purchased_bookings}
     return render(request, 'UWEFlix/purchased_bookings.html', context)
 
+
 def profile(request):
     user = request.user
     if request.method == 'POST':
-        form = PasswordChangeForm(user, request.POST)
-        if form.is_valid():
-            user = form.save()
-            # Update the session hash to prevent session hijacking
+        # update the user's details
+        user.email = request.POST.get('email')
+        user.first_name = request.POST.get('first_name')
+        user.last_name = request.POST.get('last_name')
+        user.save()
+
+        # update the user's password, if provided
+        password_form = PasswordChangeForm(user, request.POST)
+        if password_form.is_valid():
+            user = password_form.save()
             update_session_auth_hash(request, user)
-            return redirect('profile')
-        else:
-            # Handle invalid form submission
-            return render(request, 'UWEFlix/profile.html', {'form': form, 'user': user})
+        
+        return redirect('profile')
+
     else:
         form = PasswordChangeForm(user)
-        return render(request, 'UWEFlix/profile.html', {'form': form, 'user': user})
+    return render(request, 'UWEFlix/profile.html', {'form': form})
 
 def delete_account(request):
     if request.method == 'POST':
