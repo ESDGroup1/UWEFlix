@@ -1,3 +1,4 @@
+from datetime import datetime
 from decimal import Decimal
 from pyexpat.errors import messages
 from django.shortcuts import render, get_object_or_404, redirect
@@ -5,7 +6,7 @@ from django.urls import reverse
 from CinManager.models import ClubRep, Club
 from web_project import settings
 from .models import Showing, Booking
-from Accounts.models import PaymentDetails, Account
+from Accounts.models import PaymentDetails, Account, Receipt, PersonalReceipt
 import stripe
 
 stripe.api_key = settings.STRIPE_SECRET_KEY
@@ -222,9 +223,8 @@ def clubrep_payment(request, booking_id):
         return render(request, 'UWEFlix/no_account_found.html', context)
 
 
-
-
 def payment_success(request, booking_id):
+    userpermissions = check_permissions(request)
     # Get the booking object
     booking = get_object_or_404(
         Booking, id=booking_id, user=request.user, purchased=False)
@@ -238,5 +238,40 @@ def payment_success(request, booking_id):
     showing.bookedseats += booking.get_total_tickets()
     showing.save()
 
-    context = {'booking': booking}
+    # Make receipt for Club Rep
+    if userpermissions == 2:
+        print("Club Rep RECEIPT")
+        clubrep = get_object_or_404(ClubRep, user=request.user)
+        club = get_object_or_404(Club, clubrep=clubrep)
+        account = get_object_or_404(Account, club=club)
+        Receipt.objects.create(
+            account=account,
+            date=datetime.now(),
+            showing=booking.showing,
+            adult_tickets=booking.adult_tickets,
+            student_tickets=booking.student_tickets,
+            child_tickets=booking.child_tickets,
+            price=booking.get_price()
+        )
+
+    # Skip if user is a Guest
+    elif userpermissions == 4:
+        print("Guest RECEIPT")
+        pass
+
+    # Make personal receipt for Customer
+    else:
+        print("Customer RECEIPT")
+        PersonalReceipt.objects.create(
+            user=request.user,
+            date=datetime.now(),
+            showing=booking.showing,
+            adult_tickets=booking.adult_tickets,
+            student_tickets=booking.student_tickets,
+            child_tickets=booking.child_tickets,
+            price=booking.get_price()
+        )
+
+    context = {'booking': booking, 'userpermissions': userpermissions, 'club_id': club.id}
     return render(request, 'UWEFlix/payment_success.html', context)
+
