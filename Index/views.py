@@ -1,10 +1,15 @@
 from django.contrib import messages
 from django.contrib.auth import logout
 from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import reverse_lazy
 from CinManager.models import Club, ClubRep, Film, Screen, Showing
 from datetime import datetime
 from Bookings.models import Booking
 from django.utils import timezone
+from django.contrib.auth import authenticate, login, update_session_auth_hash
+from django.contrib.auth.forms import PasswordChangeForm
+from django.shortcuts import render, redirect
+from django.contrib.auth.forms import UserChangeForm
 
 def check_permissions(request):
     if request.user.is_authenticated:
@@ -133,3 +138,27 @@ def purchased_bookings(request):
 
     context = {'bookings': purchased_bookings}
     return render(request, 'UWEFlix/purchased_bookings.html', context)
+
+def profile(request):
+    user = request.user
+    if request.method == 'POST':
+        form = PasswordChangeForm(user, request.POST)
+        if form.is_valid():
+            user = form.save()
+            # Update the session hash to prevent session hijacking
+            update_session_auth_hash(request, user)
+            return redirect('profile')
+        else:
+            # Handle invalid form submission
+            return render(request, 'UWEFlix/profile.html', {'form': form, 'user': user})
+    else:
+        form = PasswordChangeForm(user)
+        return render(request, 'UWEFlix/profile.html', {'form': form, 'user': user})
+
+def delete_account(request):
+    if request.method == 'POST':
+        request.user.delete()
+        messages.success(request, 'Your account has been deleted.')
+        logout(request)
+        return redirect('logout')
+    return render(request, 'UWEFlix/delete_account_modal.html')

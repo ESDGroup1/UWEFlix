@@ -8,6 +8,8 @@ urlpatterns = [
     path('logout/', views.logout_view, name="logout"),
     path('test404/', views.error_404, name='test404'),
     path('bookings/', views.purchased_bookings, name='purchased_bookings'),
+    path('profile/', views.profile, name='profile'),
+    path('profile/delete-account/', views.delete_account, name='delete_account'),
     ]
 
 handler404 = 'Index.views.error_404'

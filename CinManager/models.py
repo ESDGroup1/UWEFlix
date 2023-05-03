@@ -37,4 +37,3 @@ class ClubRep(models.Model):
     user = models.OneToOneField(User, on_delete=models.DO_NOTHING)
     dateofbirth = models.DateField(default=datetime.now)
     club = models.OneToOneField(Club, on_delete=models.CASCADE)
-#Make a seperate user account for connecting the clubrep - generate a random password for that new user

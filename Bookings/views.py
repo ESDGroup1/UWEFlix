@@ -176,20 +176,19 @@ def payment(request, booking_id):
                 'price_data': {
                     'currency': 'gbp',
                     'product_data': {
-                        'name': 'Ticket for ' + booking.showing.film.title,
-                        'description': 'Showing at ' + str(booking.showing.date),
+                        'name': 'Account top up',
+                        'description': 'Quanity',
                     },
                     'unit_amount': int(price) * 100,
                 },
                 'quantity': 1,
             }],
             mode='payment',
-            success_url=request.build_absolute_uri(
-                reverse('payment_success', args=[booking_id])),
-            cancel_url=request.build_absolute_uri(
-                reverse('add_to_cart', args=[booking.showing.id])),
+            success_url = reverse('clubrep_payment_success', args=[clubrep.id, price]),
+            cancel_url=request.build_absolute_uri(reverse('clubrep_dashboard')),
             **payment_data,
         )
+
 
         # Store the Session ID in the booking object
         booking.stripe_session_id = session.id

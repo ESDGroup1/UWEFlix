@@ -35,7 +35,7 @@
                         <a class="dropdown-toggle nav-link" aria-expanded="true" data-bs-toggle="dropdown" href="#">My Account</a>
                         <div class="dropdown-menu" data-bs-popper="none">
                             <a class="dropdown-item" href="{% url 'edit_payment_details' %}">Payment Details</a>
-                            <a class="dropdown-item" href="#">Personal Details</a>
+                            <a class="dropdown-item" href="{% url 'profile' %}">Personal Details</a>
                             <a class="dropdown-item" href="{% url 'purchased_bookings' %}">My Showings</a>
                             <a class="dropdown-item" href="#">Order History</a>
                         </div>
@@ -57,7 +57,7 @@
                         <a class="dropdown-toggle nav-link" aria-expanded="true" data-bs-toggle="dropdown" href="#">My Club</a>
                             <div class="dropdown-menu" data-bs-popper="none">
                                 <a class="dropdown-item" href="{% url 'update_club_rep' club_id=club_id %}">View Club Details</a>
-                                <a class="dropdown-item" href="#">View Club Account</a>
+                                <a class="dropdown-item" href="{% url 'clubrep_dashboard'%}">View Club Account</a>
                                 <a class="dropdown-item" href="#">View Statements</a>
                             </div>
                     </li>

@@ -69,7 +69,6 @@ def login_guest_view(request):
 
     return redirect("Login")
 
-
 #Standard django logout
 def logout_view(request):
     logout(request)
