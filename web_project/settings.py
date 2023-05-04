@@ -29,7 +29,7 @@ STRIPE_PUBLIC_KEY = 'pk_test_51N07WbDBkL7VmWPMftp4D55jM66LKElXekwmHAb03M1hQzXqVP
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["*"]
 
 
 # Application definition
@@ -88,8 +88,12 @@ WSGI_APPLICATION = 'web_project.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'uweflix_db',
+        'USER': 'uweflix_user',
+        'PASSWORD': 'your_password',
+        'HOST': 'db',  # This should match the service name in your docker-compose.yml
+        'PORT': '5432',
     }
 }
 
