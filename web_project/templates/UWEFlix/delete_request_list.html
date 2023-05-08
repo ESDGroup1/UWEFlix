@@ -1,0 +1,78 @@
+{% extends 'UWEFlix/layout.html' %}
+
+{% block content %}
+<div class="container">
+    <h1>Cancellation Requests</h1>
+    {% if delete_requests %}
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>User</th>
+                    <th>Film</th>
+                    <th>Showing Date</th>
+                    <th>Adult Tickets</th>
+                    <th>Student Tickets</th>
+                    <th>Child Tickets</th>
+                    <th>Price</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for delete_request in delete_requests %}
+                    <tr>
+                        <td>{{ delete_request.user }}</td>
+                        <td>{{ delete_request.booking.showing.film.title }}</td>
+                        <td>{{ delete_request.booking.showing.date }}</td>
+                        <td>{{ delete_request.booking.adult_tickets }}</td>
+                        <td>{{ delete_request.booking.student_tickets }}</td>
+                        <td>{{ delete_request.booking.child_tickets }}</td>
+                        <td>£{{ delete_request.booking.price }}</td>
+                        <td>
+                            <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#confirmModal" data-delete-request-id="{{ delete_request.id }}">Accept</button>
+                            <a href="{% url 'deny_delete_request' delete_request.id %}" class="btn btn-danger">Deny</a>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>No cancellation requests found.</p>
+    {% endif %}
+</div>
+
+<!-- Confirmation Modal -->
+<div class="modal fade" id="confirmModal" tabindex="-1" aria-labelledby="confirmModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="confirmModalLabel">Confirmation</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                Are you sure you want to accept this cancellation request?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <a href="#" class="btn btn-success" id="acceptButton">Accept</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    var acceptButton = document.getElementById('acceptButton');
+    var modalConfirmButton = document.querySelector('#confirmModal .modal-footer #acceptButton');
+
+    modalConfirmButton.addEventListener('click', function() {
+        var deleteRequestId = modalConfirmButton.getAttribute('data-delete-request-id');
+        var url = "{% url 'delete_request' 0 %}".replace('0', deleteRequestId);
+        window.location.href = url;
+    });
+
+    $('#confirmModal').on('show.bs.modal', function(event) {
+        var button = $(event.relatedTarget);
+        var deleteRequestId = button.data('delete-request-id');
+        acceptButton.setAttribute('data-delete-request-id', deleteRequestId);
+    });
+</script>
+{% endblock %}

@@ -13,6 +13,7 @@
                     <th>Student Tickets</th>
                     <th>Child Tickets</th>
                     <th>Screen Number</th>
+                    <th>Action</th>
                 </tr>
             </thead>
             <tbody>
@@ -24,7 +25,29 @@
                         <td>{{ booking.student_tickets }}</td>
                         <td>{{ booking.child_tickets }}</td>
                         <td>{{ booking.showing.screen.number }}</td>
+                        <td>
+                            <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#cancelModal{{ booking.id }}">Cancel</button>
+                        </td>
                     </tr>
+                    <!-- Cancel Modal -->
+                    <div class="modal fade" id="cancelModal{{ booking.id }}" tabindex="-1" aria-labelledby="cancelModalLabel{{ booking.id }}" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="cancelModalLabel{{ booking.id }}">Request to Cancel Booking</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    Are you sure you want to send a cancel request for this booking?
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                    <a href="{% url 'confirm_delete' booking.id %}" class="btn btn-danger">Confirm Request</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- End Cancel Modal -->
                 {% endfor %}
             </tbody>
         </table>

@@ -1,18 +1,6 @@
 <!DOCTYPE html>
 <html>
 
-{% if messages %}
-    <div class="dropdown-messages">
-        {% for message in messages %}
-            <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                {{ message }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
-        {% endfor %}
-    </div>
-{% endif %}
-
-
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
@@ -27,24 +15,26 @@
 </head>
 
 <body>
-        <!-- jQuery library -->
+    <!-- jQuery library -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 
     <!-- Bootstrap JavaScript -->
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <nav class="navbar navbar-dark navbar-expand-lg bg-white portfolio-navbar gradient">
         <div class="container"><a class="navbar-brand logo" href="#">
-            <i class="icon-screen-desktop"> </i> <strong>&nbsp;UWEFlix</strong></a><button data-bs-toggle="collapse"
-                class="navbar-toggler" data-bs-target="#navbarNav"><span class="visually-hidden">Toggle navigation</span><span class="navbar-toggler-icon"></span></button>
+                <i class="icon-screen-desktop"> </i> <strong>&nbsp;UWEFlix</strong></a><button data-bs-toggle="collapse"
+                class="navbar-toggler" data-bs-target="#navbarNav"><span class="visually-hidden">Toggle
+                    navigation</span><span class="navbar-toggler-icon"></span></button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav metus"></ul>
                 <ul class="navbar-nav">
                     <li class="nav-item"><a class="nav-link active" href="{% url 'home' %}">Home</a></li>
                     <li class="nav-item"><a class="nav-link active" href="{% url 'allclubs' %}">View Clubs</a></li>
-                    
+
                     {% if userpermissions != 4 and userpermissions != 2 %}
                     <li class="nav-item dropdown show">
-                        <a class="dropdown-toggle nav-link" aria-expanded="true" data-bs-toggle="dropdown" href="#">My Account</a>
+                        <a class="dropdown-toggle nav-link" aria-expanded="true" data-bs-toggle="dropdown" href="#">My
+                            Account</a>
                         <div class="dropdown-menu" data-bs-popper="none">
                             <a class="dropdown-item" href="{% url 'edit_payment_details' %}">Payment Details</a>
                             <a class="dropdown-item" href="{% url 'profile' %}">Personal Details</a>
@@ -52,47 +42,63 @@
                             <a class="dropdown-item" href="{% url 'personal_receipts' %}">Order History</a>
                         </div>
                     </li>
-                {% endif %}
+                    {% endif %}
 
                     {% if userpermissions == 3 %}
                     <li class="nav-item dropdown show">
-                        <a class="dropdown-toggle nav-link" aria-expanded="true" data-bs-toggle="dropdown" href="#">Account Manager Options</a>
-                            <div class="dropdown-menu" data-bs-popper="none">
-                                <a class="dropdown-item" href="{% url 'club_list' %}">View Accounts</a>
-                                <a class="dropdown-item" href="{% url 'statement_list' %}">View Statements</a>
-                            </div>
+                        <a class="dropdown-toggle nav-link" aria-expanded="true" data-bs-toggle="dropdown"
+                            href="#">Account Manager Options</a>
+                        <div class="dropdown-menu" data-bs-popper="none">
+                            <a class="dropdown-item" href="{% url 'club_list' %}">View Accounts</a>
+                            <a class="dropdown-item" href="{% url 'statement_list' %}">View Statements</a>
+                        </div>
                     </li>
                     {% endif %}
 
                     {% if userpermissions == 2 %}
                     <li class="nav-item dropdown show">
                         <a class="dropdown-toggle nav-link" aria-expanded="true" data-bs-toggle="dropdown" href="#">My Club</a>
-                            <div class="dropdown-menu" data-bs-popper="none">
-                                <a class="dropdown-item" href="{% url 'update_club_rep' club_id=club_id %}">View Club Details</a>
-                                <a class="dropdown-item" href="{% url 'clubrep_dashboard'%}">View Club Account</a>
-                                <a class="dropdown-item" href="{% url 'club_account'%}">View Monthly Transactions</a>
-                            </div>
+                        <div class="dropdown-menu" data-bs-popper="none">
+                            <a class="dropdown-item" href="{% url 'update_club_rep' club_id=club_id %}">View Club Details</a>
+                            <a class="dropdown-item" href="{% url 'clubrep_dashboard'%}">View Club Account</a>
+                            <a class="dropdown-item" href="{% url 'club_account'%}">View Monthly Transactions</a>
+                            <a class="dropdown-item" href="{% url 'view_club_bookings'%}">View Club Bookings</a>
+                        </div>
                     </li>
                     {% endif %}
 
                     {% if userpermissions == 1 %}
                     <li class="nav-item dropdown show">
-                        <a class="dropdown-toggle nav-link" aria-expanded="true" data-bs-toggle="dropdown" href="#">Cinema Manager Options</a>
+                        <a class="dropdown-toggle nav-link" aria-expanded="true" data-bs-toggle="dropdown"
+                            href="#">Cinema Manager Options</a>
                         <div class="dropdown-menu" data-bs-popper="none">
                             <a class="dropdown-item" href="{% url 'addfilm' %}">Add Film</a>
                             <a class="dropdown-item" href="{% url 'addcinman' %}">Add Cinema Manager</a>
                             <a class="dropdown-item" href="{% url 'createclub' %}">Create Club</a>
                             <a class="dropdown-item" href="{% url 'createscreen' %}">Create Screen</a>
                             <a class="dropdown-item" href="{% url 'createshowing' %}">Create Showing</a>
+                            <a class="dropdown-item" href="{% url 'delete_request_list' %}">View Requests</a>
                         </div>
                     </li>
                     {% endif %}
                 </ul>
             </div>
             <a class="btn btn-primary" href="{% url 'logout' %}" style="background: rgba(120,14,255,0.36);">Log Out</a>
-            </div>
-            
+        </div>
+
     </nav>
+
+    {% if messages %}
+    <div class="dropdown-messages">
+        {% for message in messages %}
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
 
     {% block content %}{% endblock %}
 
@@ -101,18 +107,26 @@
         <div class="container">
             <div class="links">
                 <a href="https://www.uwe.ac.uk/about" target="_blank">About UWE</a>
-                <a href="https://www.uwe.ac.uk/life/campus-and-facilities/information-points#:~:text=Email%20infopoint%40uwe.ac.,Ask%20a%20question%20through%20infohub." target="_blank">Contact Us</a>
+                <a href="https://www.uwe.ac.uk/life/campus-and-facilities/information-points#:~:text=Email%20infopoint%40uwe.ac.,Ask%20a%20question%20through%20infohub."
+                    target="_blank">Contact Us</a>
             </div>
             <div class="social-icons">
-                <a href="https://www.facebook.com/uwebristol/" target="_blank"><i class="icon ion-social-facebook"></i></a>
-                <a href="https://www.instagram.com/uwebristol/?hl=en" target="_blank"><i class="icon ion-social-instagram-outline"></i></a>
-                <a href="https://twitter.com/UWEBristol?ref_src=twsrc%5Egoogle%7Ctwcamp%5Eserp%7Ctwgr%5Eauthor" target="_blank"><i class="icon ion-social-twitter"></i></a>
+                <a href="https://www.facebook.com/uwebristol/" target="_blank"><i
+                        class="icon ion-social-facebook"></i></a>
+                <a href="https://www.instagram.com/uwebristol/?hl=en" target="_blank"><i
+                        class="icon ion-social-instagram-outline"></i></a>
+                <a href="https://twitter.com/UWEBristol?ref_src=twsrc%5Egoogle%7Ctwcamp%5Eserp%7Ctwgr%5Eauthor"
+                    target="_blank"><i class="icon ion-social-twitter"></i></a>
             </div>
         </div>
     </footer>
     <!-- jQuery and Bootstrap JavaScript -->
-    <script src="https://code.jquery.com/jquery-3.6.0.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/js/bootstrap.bundle.min.js" integrity="sha384-c76GKb8lIDoJwNWkJe1QfYKFzvv8rD0hTzTfSGvaBHgM7sMd+qc16MztkNQ9ms2N" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.slim.min.js"
+        integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-c76GKb8lIDoJwNWkJe1QfYKFzvv8rD0hTzTfSGvaBHgM7sMd+qc16MztkNQ9ms2N"
+        crossorigin="anonymous"></script>
     <script src="{% static 'assets/bootstrap/js/bootstrap.min.js' %}"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pikaday/1.6.1/pikaday.min.js"></script>
     <script src="{% static 'assets/js/script.min.js' %}"></script>

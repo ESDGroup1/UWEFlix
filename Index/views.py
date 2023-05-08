@@ -4,7 +4,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse_lazy
 from CinManager.models import Club, ClubRep, Film, Screen, Showing
 from datetime import datetime
-from Bookings.models import Booking
+from Bookings.models import Booking, deleteRequest
 from django.utils import timezone
 from django.contrib.auth import authenticate, login, update_session_auth_hash
 from django.contrib.auth.forms import PasswordChangeForm
@@ -133,9 +133,16 @@ def error_404(request, exception):
 
 def purchased_bookings(request):
     # Get all purchased bookings for the current user
+    userpermissions = check_permissions(request)
     purchased_bookings = Booking.objects.filter(user=request.user, purchased=True, showing__date__gt=timezone.now().date())
 
-    context = {'bookings': purchased_bookings}
+    if userpermissions == 2:
+        club_rep = ClubRep.objects.get(user=request.user)
+        club_id = club_rep.club.id
+    else:
+        club_id = 0
+
+    context = {'bookings': purchased_bookings, 'userpermissions': userpermissions, 'club_id': club_id}
     return render(request, 'UWEFlix/purchased_bookings.html', context)
 
 
@@ -169,3 +176,34 @@ def delete_account(request):
         return redirect('logout')
     return render(request, 'UWEFlix/delete_account_modal.html')
 
+def confirm_delete(request, booking_id):
+    booking = get_object_or_404(Booking, id=booking_id, user=request.user)
+    userpermissions = check_permissions(request)
+
+    if userpermissions == 2:
+        club_rep = ClubRep.objects.get(user=request.user)
+        club_id = club_rep.club.id
+    
+    # Check if deleteRequest already exists for the booking
+    existing_request = deleteRequest.objects.filter(booking=booking).exists()
+    if existing_request:
+        messages.error(request, 'A delete request already exists for this booking.')
+        return redirect('purchased_bookings')
+    
+    delete_request = deleteRequest.objects.create(user=request.user, booking=booking)
+    messages.success(request, 'Your request has been sent to the cinema manager.')
+    return redirect('purchased_bookings')
+
+def viewclubbookings(request):
+    userpermissions = check_permissions(request)
+    if userpermissions == 2:
+        club_rep = ClubRep.objects.get(user=request.user)
+        club_id = club_rep.club.id
+    else:
+        messages.error(request, "Sorry, No club was found.")
+        club_id = 0
+        return redirect('home', club_id=club_id)
+        
+    print("CLUB ID IS: ",club_id)
+    bookings = Booking.objects.filter(user=request.user, purchased=True, showing__date__gt=timezone.now().date())
+    return render(request, 'UWEFlix/purchased_bookings.html', {'bookings': bookings, 'userpermissions': userpermissions, 'club_id': club_id})
