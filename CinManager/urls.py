@@ -12,4 +12,7 @@ urlpatterns = [
     path('updateclub/<int:club_id>', views.update_club, name='update_club'),
     path('club/<int:club_id>/update/', views.update_club_rep, name='update_club_rep'),
     path('clubcreatedsucess/<str:username>/<str:password>/', views.clubcreatedsucess, name='clubcreatedsucess'),
+    path('delete-requests/', views.delete_request_list, name='delete_request_list'),
+    path('delete-request/<int:deleteRequest_id>/', views.deleteRequests, name='delete_request'),
+    path('deny-delete-request/<int:deleteRequest_id>/', views.denyrequest, name='deny_delete_request'),
     ]
