@@ -99,7 +99,6 @@ def film_detail_view(request, film_id):
                 # show message if there are no showings for the selected film on the selected date
                 messages.warning(request, "Sorry, there are no showings for this film on the selected date.")
         except ValueError:
-            messages.error(request, "Invalid date format.")
             showings = Showing.objects.filter(film=film)
     else:
         showings = Showing.objects.filter(film=film)
@@ -142,6 +141,7 @@ def purchased_bookings(request):
 
 def profile(request):
     user = request.user
+    userpermissions = check_permissions(request)
     if request.method == 'POST':
         # update the user's details
         user.email = request.POST.get('email')
@@ -159,7 +159,7 @@ def profile(request):
 
     else:
         form = PasswordChangeForm(user)
-    return render(request, 'UWEFlix/profile.html', {'form': form})
+    return render(request, 'UWEFlix/profile.html', {'form': form, 'userpermissions': userpermissions})
 
 def delete_account(request):
     if request.method == 'POST':

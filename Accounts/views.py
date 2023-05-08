@@ -83,6 +83,7 @@ def club_list(request):
 
 
 def create_or_view_account(request, club_id):
+    userpermissions = check_permissions(request)
     print("TRIGGERED CREATE_OR_VIEW")
     club = get_object_or_404(Club, id=club_id)
     account_exists = Account.objects.filter(club=club).exists()
@@ -100,31 +101,35 @@ def create_or_view_account(request, club_id):
 
 
 def view_account(request, club_id):
+    userpermissions = check_permissions(request)
     club = get_object_or_404(Club, id=club_id)
     account = get_object_or_404(Account, club=club)
-    if request.method == 'POST':
-        discount_rate = request.POST.get('discount_rate')
-        if discount_rate is not None:
-            try:
-                discount_rate = int(discount_rate)
-                if discount_rate >= 0:
-                    club.discount_rate = discount_rate
-                    club.save()
-                    messages.success(
-                        request, "Discount rate updated successfully.")
-                else:
+    if userpermissions != 3:
+        return redirect('home')
+    else:
+        if request.method == 'POST':
+            discount_rate = request.POST.get('discount_rate')
+            if discount_rate is not None:
+                try:
+                    discount_rate = int(discount_rate)
+                    if discount_rate >= 0:
+                        club.discount_rate = discount_rate
+                        club.save()
+                        messages.success(
+                            request, "Discount rate updated successfully.")
+                    else:
+                        messages.error(
+                            request, "Discount rate should be a positive integer.")
+                except ValueError:
                     messages.error(
                         request, "Discount rate should be a positive integer.")
-            except ValueError:
-                messages.error(
-                    request, "Discount rate should be a positive integer.")
+            else:
+                account.delete()
+                messages.success(request, "Account deleted successfully.")
+            return redirect('club_list')
         else:
-            account.delete()
-            messages.success(request, "Account deleted successfully.")
-        return redirect('club_list')
-    else:
-        context = {'club': club, 'account': account}
-        return render(request, 'UWEFlix/view_account.html', context)
+            context = {'club': club, 'account': account, 'userpermissions': userpermissions}
+            return render(request, 'UWEFlix/view_account.html', context)
 
 
 def clubrep_dashboard(request):
@@ -186,7 +191,7 @@ def clubrep_dashboard(request):
             **payment_data,
         )
 
-        context = {'session_id': session.id}
+        context = {'session_id': session.id, 'userpermissions': userpermissions, 'club_id': clubrep.club.id}
         return render(request, 'UWEFlix/payment.html', context)
 
     return render(request, 'UWEFlix/clubrep_dashboard.html', context)
@@ -245,28 +250,33 @@ def create_monthly_statements():
 
 def statement_list(request):
     create_monthly_statements() # Create new statements every time the page is accessed
-    
-    today = datetime.now().date()
-    first_day_of_month = datetime(today.year, today.month, 1).date()
-    end_of_last_month = first_day_of_month - timedelta(days=1)
-    start_of_last_month = datetime(end_of_last_month.year, end_of_last_month.month, 1).date()
+    userpermissions = check_permissions(request)
+    if userpermissions != 3:
+        return redirect('home')
+    else:
+        today = datetime.now().date()
+        first_day_of_month = datetime(today.year, today.month, 1).date()
+        end_of_last_month = first_day_of_month - timedelta(days=1)
+        start_of_last_month = datetime(end_of_last_month.year, end_of_last_month.month, 1).date()
 
-    statements = Statement.objects.filter(startdate=start_of_last_month, enddate=end_of_last_month)
-    
-    context = {'statements': statements}
+        statements = Statement.objects.filter(startdate=start_of_last_month, enddate=end_of_last_month)
+        
+        context = {'statements': statements, 'userpermissions': userpermissions}
     return render(request, 'UWEFlix/statement_list.html', context)
 
 
 def statement_detail(request, statement_id):
+    userpermissions = check_permissions(request)
     statement = get_object_or_404(Statement, pk=statement_id)
     account = statement.account
     receipts = Receipt.objects.filter(account=account, date__range=[statement.startdate, statement.enddate])
     club_receipts = ClubReceipt.objects.filter(account=account, datetime__range=[statement.startdate, statement.enddate])
     
-    context = {'statement': statement, 'receipts': receipts, 'club_receipts': club_receipts}
+    context = {'statement': statement, 'receipts': receipts, 'club_receipts': club_receipts, 'userpermissions': userpermissions}
     return render(request, 'UWEFlix/statement_detail.html', context)
 
 def club_account(request):
+    userpermissions = check_permissions(request)
     clubrep = get_object_or_404(ClubRep, user=request.user)
     account = Account.objects.get(club=clubrep.club)
     
@@ -285,10 +295,11 @@ def club_account(request):
         datetime__range=[first_day_of_month, end_of_month]
     )
     
-    context = {'receipts': receipts, 'club_receipts': club_receipts}
+    context = {'receipts': receipts, 'club_receipts': club_receipts, 'userpermissions': userpermissions, 'club_id': clubrep.club.id}
     return render(request, 'UWEFlix/club_account.html', context)
 
 def personal_receipts(request):
+    userpermissions = check_permissions(request)
     receipts = PersonalReceipt.objects.filter(user=request.user)
-    context = {'receipts': receipts}
+    context = {'receipts': receipts, 'userpermissions': userpermissions}
     return render(request, 'UWEFlix/personal_receipts.html', context)

@@ -12,7 +12,7 @@
                     <th>Adult Tickets</th>
                     <th>Student Tickets</th>
                     <th>Child Tickets</th>
-                    <th>Price</th>
+                    <th>Screen Number</th>
                 </tr>
             </thead>
             <tbody>
@@ -23,7 +23,7 @@
                         <td>{{ booking.adult_tickets }}</td>
                         <td>{{ booking.student_tickets }}</td>
                         <td>{{ booking.child_tickets }}</td>
-                        <td>£{{ booking.price }}</td>
+                        <td>{{ booking.showing.screen.number }}</td>
                     </tr>
                 {% endfor %}
             </tbody>
