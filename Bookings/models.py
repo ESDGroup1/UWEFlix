@@ -1,6 +1,7 @@
 from django.conf import settings
 from django.db import models
-from CinManager.models import *
+from CinManager.models import Showing
+from django.contrib.auth.models import User
 
 # Create your models here.
 class Booking(models.Model):
@@ -30,3 +31,7 @@ class Booking(models.Model):
     def __str__(self):
         return f"{self.adult_tickets} adult tickets, {self.student_tickets} student tickets, {self.child_tickets} child tickets for {self.user.username} ({'purchased' if self.purchased else 'not purchased'})"
 
+class deleteRequest(models.Model):
+    id = models.AutoField(primary_key=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    booking = models.ForeignKey(Booking, on_delete=models.CASCADE)
